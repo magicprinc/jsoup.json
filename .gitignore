@@ -1,0 +1,15 @@
+.idea/
+target/
+build/
+.gradle/
+gradle/
+.settings/
+
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+*Thrash*
+gradlew.bat
+gradlew
