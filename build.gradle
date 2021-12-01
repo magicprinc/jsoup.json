@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'deltaf.jsoup.json'
-version '1.0-SNAPSHOT'
+version '0.9-SNAPSHOT'
 
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"

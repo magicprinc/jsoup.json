@@ -217,7 +217,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   public void testUnescapingTruncatedSequence() {
     String json = "[\"\\";
     //gson: JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated escape sequence at line 1 column 4 path $[0]
-    String xml = "<arr><val></val></arr>";
+    String xml = "<arr><val /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
@@ -1267,8 +1267,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\""));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\","));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\":}"));
-    assertEquals("<obj><val id=\"name\"></val><val id=\"\" class=\"null\" /></obj>", jsonToXml("{\"name\"::"));
-    assertEquals("<obj><val id=\"name\"></val><val id=\"\"></val><val id=\"\" class=\"null\" /></obj>", jsonToXml("{\"name\":::"));
+    assertEquals("<obj><val id=\"name\" /><val id=\"\" class=\"null\" /></obj>", jsonToXml("{\"name\"::"));
+    assertEquals("<obj><val id=\"name\" /><val id=\"\" /><val id=\"\" class=\"null\" /></obj>", jsonToXml("{\"name\":::"));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\":,"));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\"=}"));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\"=>}"));
@@ -1550,6 +1550,9 @@ public final class JsonTreeBuilderTest extends TestCase {
     String xmlXml = docXml.html();
     assertEquals(jsonXml, xmlXml);
     assertEquals(docJson.text(), docXml.text());
+
+    //Path fileName = Paths.get("/temp/bigdata.xml");
+    //Files.write(fileName, xmlXml.getBytes(UTF_8));
 
     assertTrue(binarySame("/bigdata.xml", jsonXml));
     assertTrue(binarySame("/bigdata.xml", xmlXml));

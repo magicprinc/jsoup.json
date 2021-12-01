@@ -731,7 +731,9 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
         }
         Element el = new Element(tag, baseUri, attr);
         if (value.length() > 0) {
-            el.appendText(value);
+          el.appendText(value);
+        } else {
+          tag.setSelfClosing();
         }
         addMetaDataToValue(el, value, typeClass);
         insertNode(el);
