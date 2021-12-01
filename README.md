@@ -7,6 +7,7 @@ See [**jsoup.org**](https://jsoup.org/) for downloads and the full [API document
 **jsoup.json** is a powerful JSON [RFC 4627](http://www.ietf.org/rfc/rfc4627.txt), 7158, [RFC 7159](http://www.ietf.org/rfc/rfc7159.txt) parser for jsoup.
 It can consume almost every text as JSON and convert it internally to an XML-tree.
 
+No extra dependencies!
 
 **example.json**
 ```json
