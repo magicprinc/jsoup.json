@@ -36,7 +36,7 @@ import org.jsoup.nodes.Node;
  * <pre>
  * {projects = [
  * {
- * 'project_name' => "Google Gson";
+ * 'project_name' =&gt; "Google Gson";
  * "url": "https://github.com/google/gson",
  * "rating": 4.956,
  * "contributors": [{
@@ -63,37 +63,37 @@ import org.jsoup.nodes.Node;
  * </pre>
  * [internal xml tree]
  * <pre>
- * &lt;obj>&lt;arr id="projects">
- * &lt;obj>
- * &lt;val id="project_name" class="quot quoted str">Google Gson&lt;/val>
- * &lt;val id="url" class="quot quoted str">https://github.com/google/gson&lt;/val>
- * &lt;val id="rating" class="unquoted num">4.956&lt;/val>
- * &lt;arr id="contributors">
- * &lt;obj>
- * &lt;val id="first_name" class="quot quoted str">Jesse&lt;/val>
- * &lt;val id="last_name" class="quot quoted str">Wilson&lt;/val>
- * &lt;val id="home_page" class="quot quoted str">https://medium.com/@swankjesse&lt;/val>
- * &lt;/obj>
- * &lt;/arr>
- * &lt;/obj>
- * &lt;obj>
- * &lt;val id="project_name" class="quot quoted str">jsoup&lt;/val>
- * &lt;val id="url" class="quot quoted str">https://jsoup.org&lt;/val>
- * &lt;val id="rating" class="unquoted num">5e10&lt;/val>
- * &lt;arr id="contributors">
- * &lt;obj>
- * &lt;val id="first_name" class="quot quoted str">Jonathan&lt;/val>
- * &lt;val id="last_name" class="quot quoted str">Hedley&lt;/val>
- * &lt;val id="home_page" class="quot quoted str">https://jhy.io&lt;/val>
- * &lt;/obj>
- * &lt;obj>
- * &lt;val id="first_name" class="quot quoted str">Andrej&lt;/val>
- * &lt;val id="last_name" class="quot quoted str">Fink&lt;/val>
- * &lt;val id="home_page" class="quot quoted str">https://github.com/magicprinc&lt;/val>
- * &lt;/obj>
- * &lt;/arr>
- * &lt;/obj>
- * &lt;/arr>&lt;/obj>
+ * &lt;obj&gt;&lt;arr id="projects"&gt;
+ * &lt;obj&gt;
+ * &lt;val id="project_name" class="quot quoted str"&gt;Google Gson&lt;/val&gt;
+ * &lt;val id="url" class="quot quoted str"&gt;https://github.com/google/gson&lt;/val&gt;
+ * &lt;val id="rating" class="unquoted num"&gt;4.956&lt;/val&gt;
+ * &lt;arr id="contributors"&gt;
+ * &lt;obj&gt;
+ * &lt;val id="first_name" class="quot quoted str"&gt;Jesse&lt;/val&gt;
+ * &lt;val id="last_name" class="quot quoted str"&gt;Wilson&lt;/val&gt;
+ * &lt;val id="home_page" class="quot quoted str"&gt;https://medium.com/@swankjesse&lt;/val&gt;
+ * &lt;/obj&gt;
+ * &lt;/arr&gt;
+ * &lt;/obj&gt;
+ * &lt;obj&gt;
+ * &lt;val id="project_name" class="quot quoted str"&gt;jsoup&lt;/val&gt;
+ * &lt;val id="url" class="quot quoted str"&gt;https://jsoup.org&lt;/val&gt;
+ * &lt;val id="rating" class="unquoted num"&gt;5e10&lt;/val&gt;
+ * &lt;arr id="contributors"&gt;
+ * &lt;obj&gt;
+ * &lt;val id="first_name" class="quot quoted str"&gt;Jonathan&lt;/val&gt;
+ * &lt;val id="last_name" class="quot quoted str"&gt;Hedley&lt;/val&gt;
+ * &lt;val id="home_page" class="quot quoted str"&gt;https://jhy.io&lt;/val&gt;
+ * &lt;/obj&gt;
+ * &lt;obj&gt;
+ * &lt;val id="first_name" class="quot quoted str"&gt;Andrej&lt;/val&gt;
+ * &lt;val id="last_name" class="quot quoted str"&gt;Fink&lt;/val&gt;
+ * &lt;val id="home_page" class="quot quoted str"&gt;https://github.com/magicprinc&lt;/val&gt;
+ * &lt;/obj&gt;
+ * &lt;/arr&gt;
+ * &lt;/obj&gt;
+ * &lt;/arr&gt;&lt;/obj&gt;
  * </pre>
  * <pre>
  * assert "Fink".equals(doc.select("#contributors obj:eq(1) #last_name").text());
@@ -101,7 +101,7 @@ import org.jsoup.nodes.Node;
  * </pre>
  *
  * <pre>
- * assertEquals("&lt;arr>&lt;val class=\"bool\">true&lt;/val>&lt;val class=\"bool\">true&lt;/val>&lt;/arr>",
+ * assertEquals("&lt;arr&gt;&lt;val class=\"bool\"&gt;true&lt;/val&gt;&lt;val class=\"bool\"&gt;true&lt;/val&gt;&lt;/arr&gt;",
  * JsonTreeBuilder.jsonToXml("[true, true]"));
  * </pre>
  *

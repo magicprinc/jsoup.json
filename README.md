@@ -47,61 +47,31 @@ assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val><
 <obj>
  <arr id="projects">
   <obj>
-   <val id="project_name" class="apos quoted str">
-    Google Gson
-   </val>
-   <val id="url" class="quot quoted str">
-    https://github.com/google/gson
-   </val>
-   <val id="rating" class="unquoted num">
-    4.956
-   </val>
+   <val id="project_name" class="apos quoted str"> Google Gson </val>
+   <val id="url" class="quot quoted str"> https://github.com/google/gson </val>
+   <val id="rating" class="unquoted num"> 4.956 </val>
    <arr id="contributors">
     <obj>
-     <val id="first_name" class="unquoted str">
-      Jesse
-     </val>
-     <val id="last_name" class="apos quoted str">
-      Wilson
-     </val>
-     <val id="home_page" class="quot quoted str">
-      https://medium.com/@swankjesse
-     </val>
+     <val id="first_name" class="unquoted str"> Jesse </val>
+     <val id="last_name" class="apos quoted str"> Wilson </val>
+     <val id="home_page" class="quot quoted str"> https://medium.com/@swankjesse </val>
     </obj>
    </arr>
   </obj>
   <obj>
-   <val id="project_name" class="unquoted str">
-    jsoup
-   </val>
-   <val id="url" class="quot quoted str">
-    https://jsoup.org
-   </val>
-   <val id="rating" class="unquoted num">
-    5e10
-   </val>
+   <val id="project_name" class="unquoted str"> jsoup </val>
+   <val id="url" class="quot quoted str"> https://jsoup.org </val>
+   <val id="rating" class="unquoted num"> 5e10 </val>
    <arr id="contributors">
     <obj>
-     <val id="first_name" class="quot quoted str">
-      Jonathan
-     </val>
-     <val id="last_name" class="quot quoted str">
-      Hedley
-     </val>
-     <val id="home_page" class="quot quoted str">
-      https://jhy.io
-     </val>
+     <val id="first_name" class="quot quoted str"> Jonathan </val>
+     <val id="last_name" class="quot quoted str"> Hedley </val>
+     <val id="home_page" class="quot quoted str"> https://jhy.io </val>
     </obj>
     <obj>
-     <val id="first_name" class="quot quoted str">
-      Andrej
-     </val>
-     <val id="last_name" class="quot quoted str">
-      Fink
-     </val>
-     <val id="home_page" class="quot quoted str">
-      https://github.com/magicprinc
-     </val>
+     <val id="first_name" class="quot quoted str"> Andrej </val>
+     <val id="last_name" class="quot quoted str"> Fink </val>
+     <val id="home_page" class="quot quoted str"> https://github.com/magicprinc </val>
     </obj>
    </arr>
   </obj>
