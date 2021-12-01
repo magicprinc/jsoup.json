@@ -17,17 +17,12 @@
 
 package org.jsoup.parser;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
+import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import junit.framework.TestCase;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
-import org.jsoup.select.Elements;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -40,10 +35,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-
-import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
-import static org.jsoup.parser.Parser.jsonParser;
-import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
+import junit.framework.TestCase;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
+import org.jsoup.select.Elements;
 
 @SuppressWarnings({"resource", "EmptyCatchBlock", "ProhibitedExceptionCaught",
     "SingleCharacterStringConcatenation","UnnecessarilyQualifiedStaticallyImportedElement",
@@ -92,7 +91,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipObjectAfterPeek() throws Exception {
+  public void testSkipObjectAfterPeek() {
     String json = "{" + "  \"one\": { \"num\": 1 }"
         + ", \"two\": { \"num\": 2 }" + ", \"three\": { \"num\": 3 }" + "}";
     String xml = "<obj><obj id=\"one\"><val id=\"num\">1</val></obj>" +
@@ -141,7 +140,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
   
-  public void testNulls() throws Exception {
+  public void testNulls() {
     try {
       jsonToXml(null);
       fail();
@@ -182,8 +181,8 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val>\"</val>"+//"\""
         "<val>:</val>"+//":"
         "<val>,</val>"+//","
-        "<val>\b</val>"+//"\b"
-        "<val>\f</val>"+//"\f"
+        "<val>&#x8;</val>"+//"\b"
+        "<val>&#xc;</val>"+//"\f"
         "<val>\n</val>"+//"\n"
         "<val>\r</val>"+//"\r"
         "<val>\t</val>"+//"\t"
@@ -193,8 +192,8 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val>}</val>"+//"}"
         "<val>[</val>"+//"["
         "<val>]</val>"+//"]"
-        "<val>\0</val>"+//"\0"
-        "<val>\u0019</val>"+//"\u0019"
+        "<val>&#x0;</val>"+//"\0"
+        "<val>&#x19;</val>"+//"\u0019"
         "<val>\u20AC</val>"+//"\u20AC"
         "</arr>";
     
@@ -204,14 +203,14 @@ public final class JsonTreeBuilderTest extends TestCase {
   public void testUnescapingInvalidCharacters() {
     String json = "[\"\\u000g\"]";
     //gson: expected NumberFormatException: \\u000g
-    String xml = "<arr><val>\u0000g</val></arr>";
+    String xml = "<arr><val>&#x0;g</val></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
   public void testUnescapingTruncatedCharacters() {
     String json = "[\"\\u000";
     //gson: expected IOException = MalformedJsonException: Unterminated escape sequence at line 1 column 5 path $[0]
-    String xml = "<arr><val>\u0000</val></arr>";
+    String xml = "<arr><val>&#x0;</val></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
@@ -505,7 +504,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
   public void testPrematurelyClosed() throws IOException {
-    final byte[] ba = "{\"a\":[]}".getBytes("UTF-8");
+    final byte[] ba = "{\"a\":[]}".getBytes(UTF_8);
 
     FakeInputStream is = new FakeInputStream(ba, 0);
     Document doc = Jsoup.parse(is, "UTF-8", "", jsonParser());
@@ -518,10 +517,12 @@ public final class JsonTreeBuilderTest extends TestCase {
     is = new FakeInputStream(ba, 2);
     doc = Jsoup.parse(is, "UTF-8", "", jsonParser());
     String xml = "<obj>\n <val id=\"\" class=\"null\" />\n</obj>";
+    doc.outputSettings().prettyPrint(true);
     assertEquals(xml, doc.html());
 
     is = new FakeInputStream(ba, 4);
     doc = Jsoup.parse(is, "UTF-8", "", jsonParser());
+    doc.outputSettings().prettyPrint(true);
     assertEquals(xml.replace("id=\"\"", "id=\"a\""), doc.html());
   }
 
@@ -596,7 +597,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testCommentsInStringValue() throws Exception {
+  public void testCommentsInStringValue() {
     String json = "[\"// comment\"]";
     String xml = "<arr><val>// comment</val></arr>";
     
@@ -1330,7 +1331,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testDeepArray () throws Exception {
+  public void testDeepArray () {
     String json = repeat('[', 12345)+"42"+repeat(']', 12345);
     String xml = json.replace("[", "<arr>").replace("]", "</arr>").replace("42", "<val>42</val>");
     //gson: JsonParseException: Failed parsing JSON source: JsonReader at line 1 column 7792 path $[0] - StackOverflowError
@@ -1341,7 +1342,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testJustTextNotJson () throws Exception {
+  public void testJustTextNotJson () {
     String json = "This is not a JSON! But... Try it, ok? 42, 1; 2; 'tester' 17\n 95, foo = \"bar\"; true";
     String xml = "<val>This</val><val>is</val><val>not</val><val>a</val><val>JSON!</val>" +
         "<val>But...</val><val>Try</val><val>it</val><val>ok?</val>" +
@@ -1353,7 +1354,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testMetaData () throws Exception {
+  public void testMetaData () {
     String json = "{'a'=-42, b: \"1sorry \", \"c\" : ' +3.14159 \t\n' d=>'http://ya.ru'}";
 
     JsonTreeBuilder treeBuilder = new JsonTreeBuilder(){
@@ -1428,16 +1429,13 @@ public final class JsonTreeBuilderTest extends TestCase {
 
   private Document loadDoc (String fileName, Parser parser) throws AssertionError {
     try {
-      InputStream is = getClass().getResourceAsStream(fileName);
-      try {
+      try (InputStream is = getClass().getResourceAsStream(fileName)) {
         Document doc = Jsoup.parse(is, "UTF-8", "", parser);
         doc.outputSettings().prettyPrint(false);
         assertEquals(2, doc.childNodeSize());
         assertTrue(doc.childNode(0) instanceof Comment);
         assertEquals(13, doc.childNode(1).childNodeSize());
         return doc;
-      } finally {
-        is.close();
       }
     } catch(IOException e){
       throw new AssertionError("fail", e);
@@ -1474,8 +1472,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   public void testSpeed () {
     Runnable rg = new Runnable() {
       @Override public void run () {
-        try(Reader reader = new InputStreamReader(getClass().getResourceAsStream("/bigdata.json"), "UTF-8")) {
-          JsonElement doc = new JsonParser().parse(reader);
+        try(Reader reader = new InputStreamReader(getClass().getResourceAsStream("/bigdata.json"), UTF_8)) {
+          JsonElement doc = JsonParser.parseReader(reader);
 
           assert doc.getAsJsonObject().size() == 13;
 
@@ -1492,18 +1490,10 @@ public final class JsonTreeBuilderTest extends TestCase {
     };
     rg.run();
 
-    Runnable rj = new Runnable(){
-      @Override public void run () {
-        loadDoc("/bigdata.json", jsonParser(false));
-      }
-    }; 
+    Runnable rj = () -> loadDoc("/bigdata.json", jsonParser(false));
     rj.run();
 
-    Runnable rx = new Runnable() {
-      @Override public void run () {
-        loadDoc("/bigdata.xml", Parser.xmlParser());
-      }
-    };
+    Runnable rx = () -> loadDoc("/bigdata.xml", Parser.xmlParser());
     rx.run();
 
     loopIt(rg, 200);
@@ -1515,18 +1505,17 @@ public final class JsonTreeBuilderTest extends TestCase {
     long tj = loopIt(rj, 1000);
     long tx = loopIt(rx, 1000);
 
-    assert tg < tj;
-    assert tj < tx/3 : "tj="+tj+", tx="+tx;
+    assert tg < tj;//GSON is the quickest one
+    assert tj < tx : "tj="+tj+", tx="+tx;//json is the second one, but xml is fast too now (prev: 3x slower)
   }
 
 
   boolean binarySame (String canonicalXmlFileName, String generatedXmlStr) throws IOException {
-    byte[] generatedXml = generatedXmlStr.getBytes("UTF-8");
+    byte[] generatedXml = generatedXmlStr.getBytes(UTF_8);
     int total = 0;
 
-    InputStream is = getClass().getResourceAsStream(canonicalXmlFileName);
-    try {
-      byte[] buf = new byte[16*1024];
+    try (InputStream is = getClass().getResourceAsStream(canonicalXmlFileName)) {
+      byte[] buf = new byte[16 * 1024];
 
       while (true) {
         int r = is.read(buf);
@@ -1536,13 +1525,11 @@ public final class JsonTreeBuilderTest extends TestCase {
 
         for (int i = 0; i < r; i++, total++) {
           if (buf[i] != generatedXml[total]) {
-            System.out.println("pos="+total+" expected="+(char)buf[i]+", but="+(char)generatedXml[total]);
+            System.out.println("pos=" + total + " expected=" + (char) buf[i] + ", but=" + (char) generatedXml[total]);
             return false;
           }
         }
       }
-    } finally {
-      is.close();
     }
 
     boolean sameSize = total == generatedXml.length;
@@ -1557,7 +1544,9 @@ public final class JsonTreeBuilderTest extends TestCase {
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
     Document docXml  = loadDoc("/bigdata.xml",  Parser.xmlParser());
 
+    docJson.outputSettings().prettyPrint(false);
     String jsonXml = docJson.html();
+    docXml.outputSettings().prettyPrint(false);
     String xmlXml = docXml.html();
     assertEquals(jsonXml, xmlXml);
     assertEquals(docJson.text(), docXml.text());
@@ -1578,7 +1567,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testBad () throws Exception {
+  public void testBad () {
     String json = "\uFFFE\n\n)]}'\n true ; [[{;;,,\n\n]]} , [[,]] {] [} [{true=>false; 42 32\n yes='no' \"no\":'yes';n;z:";
     String xml = "<val class=\"bool\">true</val>" +
         "<arr><arr><obj></obj></arr></arr>" +
@@ -1595,7 +1584,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testEof () throws Exception {
+  public void testEof () {
     String json = "[";//gson: EOFException: End of input at line 1 column 2 path $[0]
     String xml = "<arr></arr>";
     assertEquals(xml, jsonToXml(json));
@@ -1723,7 +1712,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testIsNumeric () throws Exception {
+  public void testIsNumeric () {
     JsonTreeBuilder j = new JsonTreeBuilder();
     assertFalse(j.isNumeric(""));
     assertFalse(j.isNumeric(" \t\n"));
@@ -1765,7 +1754,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testYandexTranslate () throws Exception {
+  public void testYandexTranslate () {
     String json = "{\"code\":200,\"lang\":\"de-en\",\"text\":[\"My Name is Andrey.\"]}";
     String xml = "<obj><val id=\"code\">200</val><val id=\"lang\">de-en</val><arr id=\"text\"><val>My Name is Andrey.</val></arr></obj>";
     
@@ -1777,13 +1766,14 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testParseFragment () throws Exception {
+  public void testParseFragment () {
     Element root = new Element("fake");
     JsonTreeBuilder jtb = new JsonTreeBuilder();
     List<Node> nodes = jtb.parseFragment("[a,b,] 42", root, "foo.bar", new Parser(jtb));
     assertEquals(2, nodes.size());
     assertEquals("ab", ((Element)nodes.get(0)).text());
     assertEquals("42", ((Element)nodes.get(1)).text());
+    jtb.setPrettyPrint(true);
     assertEquals("<val class=\"unquoted str\">\n a\n</val>\n"+
         "<val class=\"unquoted str\">\n b\n</val>\n"+
         "<val class=\"null\" />", ((Element)nodes.get(0)).html());
@@ -1792,7 +1782,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void test100 () throws Exception {
+  public void test100 () {
     String json = " \r\t\n\f5";
 
     JsonTreeBuilder treeBuilder = new JsonTreeBuilder();
@@ -1836,7 +1826,7 @@ public final class JsonTreeBuilderTest extends TestCase {
                 String url = e.absUrl("href").replace("/blob/", "/raw/");
                 System.out.println(url);
                 Document d2 = Jsoup.connect(url).ignoreHttpErrors(true).ignoreContentType(true)
-                        .parser(Parser.jsonParser()).get();
+                        .parser(jsonParser()).get();
                 d2.outputSettings().prettyPrint(false);
                 //System.out.println(d2.html()+"\n");
             }

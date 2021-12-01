@@ -23,20 +23,20 @@ idea {
   }
 }
 dependencies {
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.+'
-  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.+'
-
+  testImplementation 'junit:junit:4.+'
   testImplementation "org.mockito:mockito-core:4.+"
+  testImplementation 'com.google.code.gson:gson:2.+'
 
-  //Nullable
+  // Nullable
   //implementation "javax.annotation:javax.annotation-api:+" -> org.checkerframework.checker.nullness.qual
-  compileOnly 'org.jetbrains:annotations:+'
-  annotationProcessor 'org.jetbrains:annotations:+'
-  
+  //compileOnly 'org.jetbrains:annotations:+'
+  //annotationProcessor 'org.jetbrains:annotations:+'
+  implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
   // jsoup HTML parser library @ https://jsoup.org/
   implementation 'org.jsoup:jsoup:1.14.+'
 }
 
-test {
-  useJUnitPlatform()
-}
+//test {
+//  useJUnitPlatform()
+//}
