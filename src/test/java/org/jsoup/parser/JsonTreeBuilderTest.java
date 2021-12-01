@@ -1697,8 +1697,8 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<obj><val id=\"project_name\" class=\"apos quoted str\">Google Gson</val>" +
         "<val id=\"url\" class=\"quot quoted str\">https://github.com/google/gson</val>" +
         "<val id=\"rating\" class=\"unquoted num\">4.956</val>"+
-        "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"quot quoted str\">Jesse</val>" +
-        "<val id=\"last_name\" class=\"quot quoted str\">Wilson</val>" +
+        "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"unquoted str\">Jesse</val>" +
+        "<val id=\"last_name\" class=\"apos quoted str\">Wilson</val>" +
         "<val id=\"home_page\" class=\"quot quoted str\">https://medium.com/@swankjesse</val></obj></arr></obj>" +
         "<obj><val id=\"project_name\" class=\"unquoted str\">jsoup</val>" +
         "<val id=\"url\" class=\"quot quoted str\">https://jsoup.org</val>" +
@@ -1712,6 +1712,10 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals("jsoup", doc.select("#projects #project_name.str.unquoted").text());
     assert "Fink".equals(doc.select("#contributors obj:eq(1) #last_name").text());
     assert "jsoup".equals(doc.select("#projects #project_name.str.unquoted").text());
+
+    //doc.outputSettings().prettyPrint(true);
+    //Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));
+    assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>", jsonToXml("[true, true]"));
   }
 
 
