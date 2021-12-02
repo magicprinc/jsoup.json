@@ -1702,12 +1702,13 @@ public final class JsonTreeBuilderTest extends TestCase {
     Document doc = Jsoup.parse(getClass().getResourceAsStream("/example.json"), "UTF-8", "", jsonParser());
     System.out.println(repeat('#', 100)+doc.html()+repeat('#', 100));
     //doc.outputSettings().prettyPrint(false);
-    assertEquals("<obj><arr id=\"projects\">" +
+    assertEquals(
+        "<!--\nI am here: src\\test\\resources/example.json *--><obj><arr id=\"projects\">" +
         "<obj><val id=\"project_name\" class=\"apos quoted str\">Google Gson</val>" +
         "<val id=\"url\" class=\"quot quoted str\">https://github.com/google/gson</val>" +
         "<val id=\"rating\" class=\"unquoted num\">4.956</val>"+
         "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"unquoted str\">Jesse</val>" +
-        "<val id=\"last_name\" class=\"apos quoted str\">Wilson</val>" +
+        "<val id=\" last  name \" class=\"quot quoted str\">'Wilson ' </val>" +
         "<val id=\"home_page\" class=\"quot quoted str\">https://medium.com/@swankjesse</val></obj></arr></obj>" +
         "<obj><val id=\"project_name\" class=\"unquoted str\">jsoup</val>" +
         "<val id=\"url\" class=\"quot quoted str\">https://jsoup.org</val>" +
@@ -1715,8 +1716,9 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"quot quoted str\">Jonathan</val>" +
         "<val id=\"last_name\" class=\"quot quoted str\">Hedley</val>" +
         "<val id=\"home_page\" class=\"quot quoted str\">https://jhy.io</val></obj>" +
-        "<obj><val id=\"first_name\" class=\"quot quoted str\">Andrej</val><val id=\"last_name\" class=\"quot quoted str\">Fink</val>" +
-        "<val id=\"home_page\" class=\"quot quoted str\">https://github.com/magicprinc</val></obj></arr></obj></arr></obj>", doc.html());
+        "<obj><!--/2nd OBJ in Array-->"+
+        "<val id=\"first_name\" class=\"quot quoted str\">Andrej</val><val id=\"last_name\" class=\"quot quoted str\">Fink</val>" +
+        "<val id=\" home\n     page \" class=\"quot quoted str\"> https://github.com/\n  magicprinc </val></obj></arr></obj></arr></obj>",doc.html());
     assertEquals("Fink", doc.select("#contributors obj:eq(1) #last_name").text());
     assertEquals("jsoup", doc.select("#projects #project_name.str.unquoted").text());
     assert "Fink".equals(doc.select("#contributors obj:eq(1) #last_name").text());

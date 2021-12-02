@@ -1,3 +1,5 @@
+<!--
+I am here: src\test\resources/example.json *-->
 <obj>
  <arr id="projects">
   <obj>
@@ -15,8 +17,8 @@
      <val id="first_name" class="unquoted str">
       Jesse
      </val>
-     <val id="last_name" class="apos quoted str">
-      Wilson
+     <val id=" last  name " class="quot quoted str">
+      'Wilson ' 
      </val>
      <val id="home_page" class="quot quoted str">
       https://medium.com/@swankjesse
@@ -47,14 +49,16 @@
      </val>
     </obj>
     <obj>
+     <!--/2nd OBJ in Array-->
      <val id="first_name" class="quot quoted str">
       Andrej
      </val>
      <val id="last_name" class="quot quoted str">
       Fink
      </val>
-     <val id="home_page" class="quot quoted str">
-      https://github.com/magicprinc
+     <val id=" home
+     page " class="quot quoted str">
+       https://github.com/ magicprinc 
      </val>
     </obj>
    </arr>
