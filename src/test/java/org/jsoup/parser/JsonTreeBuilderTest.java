@@ -1692,7 +1692,7 @@ public final class JsonTreeBuilderTest extends TestCase {
   public void testJavaDocExample () throws Exception {
     Document doc = Jsoup.parse(getClass().getResourceAsStream("/example.json"), "UTF-8", "", jsonParser());
     System.out.println(repeat('#', 100)+doc.html()+repeat('#', 100));
-    doc.outputSettings().prettyPrint(false);
+    //doc.outputSettings().prettyPrint(false);
     assertEquals("<obj><arr id=\"projects\">" +
         "<obj><val id=\"project_name\" class=\"apos quoted str\">Google Gson</val>" +
         "<val id=\"url\" class=\"quot quoted str\">https://github.com/google/gson</val>" +
@@ -1713,9 +1713,14 @@ public final class JsonTreeBuilderTest extends TestCase {
     assert "Fink".equals(doc.select("#contributors obj:eq(1) #last_name").text());
     assert "jsoup".equals(doc.select("#projects #project_name.str.unquoted").text());
 
-    //doc.outputSettings().prettyPrint(true);
-    //Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));
     assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>", jsonToXml("[true, true]"));
+
+    /* doc.outputSettings().prettyPrint(true);
+    Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));
+
+    doc = Jsoup.parse(getClass().getResourceAsStream("/example.json"), "UTF-8", "", jsonParser(false));
+    doc.outputSettings().prettyPrint(true);
+    Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));*/
   }
 
 

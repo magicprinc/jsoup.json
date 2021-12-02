@@ -78,3 +78,44 @@ assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val><
  </arr>
 </obj>
 ```
+
+or
+```java
+Document doc = Jsoup.parse(exampleJson, "UTF-8", "", JsonTreeBuilder.jsonParser(false));//no extra info in attrs
+```
+
+```xml
+<obj>
+ <arr id="projects">
+  <obj>
+   <val id="project_name"> Google Gson </val>
+   <val id="url"> https://github.com/google/gson </val>
+   <val id="rating"> 4.956 </val>
+   <arr id="contributors">
+    <obj>
+     <val id="first_name"> Jesse </val>
+     <val id="last_name"> Wilson </val>
+     <val id="home_page"> https://medium.com/@swankjesse </val>
+    </obj>
+   </arr>
+  </obj>
+  <obj>
+   <val id="project_name"> jsoup </val>
+   <val id="url"> https://jsoup.org </val>
+   <val id="rating"> 5e10 </val>
+   <arr id="contributors">
+    <obj>
+     <val id="first_name"> Jonathan </val>
+     <val id="last_name"> Hedley </val>
+     <val id="home_page"> https://jhy.io </val>
+    </obj>
+    <obj>
+     <val id="first_name"> Andrej </val>
+     <val id="last_name"> Fink </val>
+     <val id="home_page"> https://github.com/magicprinc </val>
+    </obj>
+   </arr>
+  </obj>
+ </arr>
+</obj>
+```
