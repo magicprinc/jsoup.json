@@ -31,6 +31,9 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1506,7 +1509,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     long tx = loopIt(rx, 1000);
 
     assert tg < tj;//GSON is the quickest one
-    assert tj < tx : "tj="+tj+", tx="+tx;//json is the second one, but xml is fast too now (prev: 3x slower)
+    assert tj < tx+777 : "tj="+tj+", tx="+tx;//json is usually the second one, but xml is fast too now
   }
 
 
@@ -1539,6 +1542,13 @@ public final class JsonTreeBuilderTest extends TestCase {
     return sameSize;
   }
 
+  void writeXml (String xml, String fileName) throws IOException {
+    String enable = System.getProperty("genXml");
+    if (enable != null && enable.length()>0) {
+      Path pathFile = Paths.get(fileName);//e.g. "/temp/bigdata.xml"
+      Files.write(pathFile, xml.getBytes(UTF_8));
+    }
+  }
 
   public void testBinarySame () throws Exception {
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
@@ -1551,8 +1561,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(jsonXml, xmlXml);
     assertEquals(docJson.text(), docXml.text());
 
-    //Path fileName = Paths.get("/temp/bigdata.xml");
-    //Files.write(fileName, xmlXml.getBytes(UTF_8));
+    writeXml(jsonXml, "/temp/bigdata.xml");
 
     assertTrue(binarySame("/bigdata.xml", jsonXml));
     assertTrue(binarySame("/bigdata.xml", xmlXml));
@@ -1715,12 +1724,11 @@ public final class JsonTreeBuilderTest extends TestCase {
 
     assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>", jsonToXml("[true, true]"));
 
-    /* doc.outputSettings().prettyPrint(true);
-    Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));
+    doc.outputSettings().prettyPrint(true);
+    writeXml(doc.html(), "/temp/example1.xml");
 
     doc = Jsoup.parse(getClass().getResourceAsStream("/example.json"), "UTF-8", "", jsonParser(false));
-    doc.outputSettings().prettyPrint(true);
-    Files.write(Paths.get("/temp/example.xml"), doc.html().getBytes(UTF_8));*/
+    writeXml(doc.html(), "/temp/example2.xml");
   }
 
 

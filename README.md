@@ -7,9 +7,11 @@ See [**jsoup.org**](https://jsoup.org/) for downloads and the full [API document
 **jsoup.json** is a powerful JSON [RFC 4627](http://www.ietf.org/rfc/rfc4627.txt), 7158, [RFC 7159](http://www.ietf.org/rfc/rfc7159.txt) parser for jsoup.
 It can consume almost every text as JSON and convert it internally to an XML-tree.
 
+All JSON elements are converted one-to-one into three XML tags (obj, arr, val), XML comment section, (very rare and with many details) "unk" tag and two main attributes (id, class).
+
 No extra dependencies!
 
-**example.json**
+[**example.json**](src/test/resources/example.json)
 ```json
 {projects: [
 {
@@ -41,8 +43,8 @@ assert "jsoup".equals(doc.select("#projects #project_name.str.unquoted").text())
 //
 assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>", JsonTreeBuilder.jsonToXml("[true, true]"));
 ``` 
-        
-**internal xml tree**
+
+[**internal XML tree 1 (with class metadata) **](src/test/resources/example1.xml)
 ```xml
 <obj>
  <arr id="projects">
@@ -84,6 +86,7 @@ or
 Document doc = Jsoup.parse(exampleJson, "UTF-8", "", JsonTreeBuilder.jsonParser(false));//no extra info in attrs
 ```
 
+[**internal XML tree 2 (no metadata) **](src/test/resources/example2.xml)
 ```xml
 <obj>
  <arr id="projects">
@@ -119,3 +122,5 @@ Document doc = Jsoup.parse(exampleJson, "UTF-8", "", JsonTreeBuilder.jsonParser(
  </arr>
 </obj>
 ```
+
+More examples are available in 135 unit-tests in [org.jsoup.parser.JsonTreeBuilderTest](/src/test/java/org/jsoup/parser/JsonTreeBuilderTest.java)
