@@ -1,15 +1,39 @@
+# Ignore Idea project-specific directory
 .idea/
-target/
-build/
+# Ignore Gradle project-specific cache directory
 .gradle/
-gradle/
+
 .settings/
+
+/shelf/
+/workspace.xml
+
+# Ignore Gradle/IDEA/Maven/etc build output directory
+out/
+build/
+classes/
+target/
+
+dist/
+
+/logs/*
+
 
 *.iml
 *.ipr
 *.iws
+*.class
 .classpath
 .project
 *Thrash*
+*.tmp
+*.$$$
+*.~*
+*.*~
+*.orig
+*.swp
+
+
+gradle/
 gradlew.bat
 gradlew

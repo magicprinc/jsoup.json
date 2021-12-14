@@ -1,10 +1,10 @@
 plugins {
-  id 'java'
-  //id 'maven-publish'
+  id 'java-library'
+  id 'maven-publish'
 }
 
-group 'deltaf.jsoup.json'
-version '0.9-SNAPSHOT'
+group = 'one.deltaf.jsoup-json'
+version = '1.0'
 
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
@@ -20,8 +20,36 @@ repositories {
 }
 
 dependencies {
-  implementation 'org.jsoup:jsoup:1.14.+' //works since 1.12
+  //works since 1.12, but XML escaping is better and XML is more compact since 1.14.2
+  api 'org.jsoup:jsoup:1.14.2'
 
   testImplementation 'junit:junit:4.+'
   testImplementation 'com.google.code.gson:gson:2.+'
+}
+
+test {
+  useJUnit()
+  maxHeapSize = '256M'
+}
+
+// https://docs.gradle.org/current/userguide/publishing_maven.html
+java {
+  withSourcesJar()
+  withJavadocJar()
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      artifactId = 'jsoup-json'
+ 
+      from components.java
+    }
+  }
+}
+
+javadoc {
+  if(JavaVersion.current().isJava9Compatible()) {
+    options.addBooleanOption('html5', true)
+  }
 }

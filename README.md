@@ -11,6 +11,8 @@ All JSON elements are converted one-to-one into three XML tags (obj, arr, val), 
 
 No extra dependencies!
 
+[Download](https://github.com/magicprinc/jsoup.json/releases/latest)
+
 [**example.json**](src/test/resources/example.json)
 ```json
 /*
