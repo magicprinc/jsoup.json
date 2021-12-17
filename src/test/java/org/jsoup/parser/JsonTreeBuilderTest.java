@@ -17,17 +17,18 @@
 
 package org.jsoup.parser;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
-import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
+import junit.framework.TestCase;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
+import org.jsoup.select.Elements;
+
+import java.io.*;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,14 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
-import junit.framework.TestCase;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Comment;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
-import org.jsoup.select.Elements;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
+import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
 
 @SuppressWarnings({"resource", "EmptyCatchBlock", "ProhibitedExceptionCaught",
     "SingleCharacterStringConcatenation","UnnecessarilyQualifiedStaticallyImportedElement",
@@ -1790,12 +1787,16 @@ public final class JsonTreeBuilderTest extends TestCase {
 
   public void testParseFragment () {
     Element root = new Element("fake");
-    JsonTreeBuilder jtb = new JsonTreeBuilder();
+    JsonTreeBuilder jtb = new JsonTreeBuilder(){
+      @Override protected void initialiseParse(Reader input, String baseUri, Parser parser) {
+        super.initialiseParse(input, baseUri, parser);
+        doc.outputSettings().prettyPrint(true);
+      }
+    };
     List<Node> nodes = jtb.parseFragment("[a,b,] 42", root, "foo.bar", new Parser(jtb));
     assertEquals(2, nodes.size());
     assertEquals("ab", ((Element)nodes.get(0)).text());
     assertEquals("42", ((Element)nodes.get(1)).text());
-    jtb.setPrettyPrint(true);
     assertEquals("<val class=\"unquoted str\">\n a\n</val>\n"+
         "<val class=\"unquoted str\">\n b\n</val>\n"+
         "<val class=\"null\" />", ((Element)nodes.get(0)).html());
@@ -1827,6 +1828,13 @@ public final class JsonTreeBuilderTest extends TestCase {
                     repeat('x', 78)+"...", treeBuilder.toString());
   }
 
+  public void testJavaDocExample2 () throws IOException {
+    Document doc = Jsoup.connect("https://github.com/magicprinc/jsoup.json/raw/master/src/test/resources/example.json").parser(jsonParser()).get();
+    assertEquals("projects", doc.child(0).child(0).id());
+
+    doc = Jsoup.parse(new File("src/test/resources/example.json"),"UTF-8","", jsonParser());
+    assertEquals("projects", doc.child(0).child(0).id());
+  }
 
   public static String jsonToDetailedXml (String json) {
     Document doc = Jsoup.parse(json, "", jsonParser());
