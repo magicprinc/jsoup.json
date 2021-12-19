@@ -1,10 +1,10 @@
-# jsoup.json: JSON parser for jsoup (Java HTML Parser)
+# json4jsoup: JSON parser for jsoup (Java HTML Parser)
 
 **jsoup** is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.
 
 See [**jsoup.org**](https://jsoup.org/) for downloads and the full [API documentation](https://jsoup.org/apidocs/), [cookbook](https://jsoup.org/cookbook/).
 
-**jsoup.json** is a powerful JSON [RFC 4627](http://www.ietf.org/rfc/rfc4627.txt), 7158, [RFC 7159](http://www.ietf.org/rfc/rfc7159.txt) parser for jsoup.
+**json4jsoup** is a powerful JSON [RFC 4627](http://www.ietf.org/rfc/rfc4627.txt), 7158, [RFC 7159](http://www.ietf.org/rfc/rfc7159.txt) parser for jsoup.
 It can consume almost every text as JSON and convert it internally to an XML-tree.
 
 All JSON elements are converted one-to-one into three XML tags (obj, arr, val), XML comment section, (very rare and with many details) "unk" tag and two main attributes (id, class).

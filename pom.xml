@@ -7,15 +7,15 @@
   <!-- that they should prefer consuming it instead. -->
   <!-- do_not_remove: published-with-gradle-metadata -->
   <modelVersion>4.0.0</modelVersion>
-  <groupId>one.deltaf.jsoup-json</groupId>
-  <artifactId>jsoup-json</artifactId>
+  <groupId>one.deltaf.json4jsoup</groupId>
+  <artifactId>json4jsoup</artifactId>
   <version>1.0</version>
   <dependencies>
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
       <version>1.14.2</version>
-      <scope>compile</scope>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

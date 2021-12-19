@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2010 Google Inc.
- * Copyright (C) 2019 Andrej Fink.
+ * Copyright (C) 2019-2021 Andrej Fink.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

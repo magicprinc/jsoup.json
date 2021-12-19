@@ -3,7 +3,7 @@ plugins {
   id 'maven-publish'
 }
 
-group = 'one.deltaf.jsoup-json'
+group = 'one.deltaf.json4jsoup'
 version = '1.0'
 
 compileJava.options.encoding = "UTF-8"
@@ -42,7 +42,7 @@ java {
 publishing {
   publications {
     maven(MavenPublication) {
-      artifactId = 'jsoup-json'
+      artifactId = 'json4jsoup'
       from components.java
     }
   }
