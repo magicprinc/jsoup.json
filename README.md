@@ -9,6 +9,7 @@ It can consume almost every text as JSON and convert it internally to an XML-tre
 
 All JSON elements are converted one-to-one into three XML tags (obj, arr, val), XML comment section, (very rare and with many details) "unk" tag and two main attributes (id, class).
 
+Compatible with all versions of jsoup since 1.12.1.
 No extra dependencies!
 
 [Download](https://github.com/magicprinc/jsoup.json/releases/latest)

@@ -1831,8 +1831,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   public void testJavaDocExample2 () throws IOException {
     Document doc = Jsoup.connect("https://github.com/magicprinc/jsoup.json/raw/master/src/test/resources/example.json").parser(jsonParser()).get();
     assertEquals("projects", doc.child(0).child(0).id());
-
-    doc = Jsoup.parse(new File("src/test/resources/example.json"),"UTF-8","", jsonParser());
+    //1.12.1 api:
+    doc = Jsoup.parse(new FileInputStream("src/test/resources/example.json"),"UTF-8","", jsonParser());
     assertEquals("projects", doc.child(0).child(0).id());
   }
 
