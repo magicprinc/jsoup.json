@@ -17,7 +17,10 @@
 package org.jsoup.parser;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.*;
+import org.jsoup.nodes.Attributes;
+import org.jsoup.nodes.Comment;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -903,42 +906,5 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     // def since 1.4.2: doc.outputSettings().prettyPrint(false);
     return doc.html();
   }
-
-  //todo fix in jsoup (make them package or protected) 1.4.3
-
-  void insertNode(Node node) {
-    currentElement().appendChild(node);
-  }
-
-  /**
-   * If the stack contains an element with this tag's name, pop up the stack to remove the first occurrence. If not
-   * found, skips.
-   *
-   * @param endTag tag to close
-   */
-  void popStackToClose(Token.EndTag endTag) {
-    // like in HtmlTreeBuilder - don't scan up forever for very (artificially) deeply nested stacks
-    String elName = settings.normalizeTag(endTag.tagName);
-    Element firstFound = null;
-
-    final int bottom = stack.size() - 1;
-    final int upper = bottom >= maxQueueDepth ? bottom - maxQueueDepth : 0;
-
-    for (int pos = stack.size() - 1; pos >= upper; pos--) {
-      Element next = stack.get(pos);
-      if (next.nodeName().equals(elName)) {
-        firstFound = next;
-        break;
-      }
-    }
-    if (firstFound == null) return; // not found, skip
-
-    for (int pos = stack.size() - 1; pos >= 0; pos--) {
-      Element next = stack.get(pos);
-      stack.remove(pos);
-      if (next == firstFound) break;
-    }
-  }
-  private static final int maxQueueDepth = 256; // an arbitrary tension point between real XML and crafted pain
 
 }

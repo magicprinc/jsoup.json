@@ -28,7 +28,12 @@ import org.jsoup.nodes.Node;
 import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,11 +45,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.charset.StandardCharsets.*;
 import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
 import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
 
-@SuppressWarnings({"resource", "EmptyCatchBlock", "ProhibitedExceptionCaught",
+@SuppressWarnings({"EmptyCatchBlock", "ProhibitedExceptionCaught",
     "SingleCharacterStringConcatenation","UnnecessarilyQualifiedStaticallyImportedElement",
     "ResultOfObjectAllocationIgnored","JUnitTestMethodWithNoAssertions"})
 public final class JsonTreeBuilderTest extends TestCase {
@@ -1359,7 +1364,7 @@ public final class JsonTreeBuilderTest extends TestCase {
 
     JsonTreeBuilder treeBuilder = new JsonTreeBuilder(){
       @Override protected void addMetaDataToValue (Element el, String value, VALUE_CLASS typeClass) {
-        assert typeClass != null;
+        assertNotNull(typeClass);
         String t;
         String v = value.trim();
         el.textNodes().get(0).text(v);
@@ -1475,13 +1480,13 @@ public final class JsonTreeBuilderTest extends TestCase {
         try(Reader reader = new InputStreamReader(getClass().getResourceAsStream("/bigdata.json"), UTF_8)) {
           JsonElement doc = JsonParser.parseReader(reader);
 
-          assert doc.getAsJsonObject().size() == 13;
+          assertEquals(13, doc.getAsJsonObject().size());
 
           ArrayList<JsonElement> r = new ArrayList<>();
           gsonVisitor(doc, r);
 
-          assert r.size() == 132;
-          assert r.get(r.size()-1).getAsJsonPrimitive().isString();
+          assertEquals(132, r.size());
+          assertTrue(r.get(r.size()-1).getAsJsonPrimitive().isString());
 
         } catch(Exception e){
           throw new AssertionError("", e);
@@ -1505,8 +1510,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     long tj = loopIt(rj, 1000);
     long tx = loopIt(rx, 1000);
 
-    assert tg < tj;//GSON is the quickest one
-    assert tj < tx+777 : "tj="+tj+", tx="+tx;//json is usually the second one, but xml is fast too now
+    assertTrue(tg < tj);//GSON is the quickest one
+    assertTrue("tj="+tj+", tx="+tx, tj < tx+777);//json is usually the 2nd one, but xml is fast too now
   }
 
 
@@ -1718,8 +1723,8 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val id=\" home\n     page \" class=\"quot quoted str\"> https://github.com/\n  magicprinc </val></obj></arr></obj></arr></obj>",doc.html());
     assertEquals("Fink", doc.select("#contributors obj:eq(1) #last_name").text());
     assertEquals("jsoup", doc.select("#projects #project_name.str.unquoted").text());
-    assert "Fink".equals(doc.select("#contributors obj:eq(1) #last_name").text());
-    assert "jsoup".equals(doc.select("#projects #project_name.str.unquoted").text());
+    assertEquals("Fink", doc.select("#contributors obj:eq(1) #last_name").text());
+    assertEquals("jsoup", doc.select("#projects #project_name.str.unquoted").text());
 
     assertEquals("<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>", jsonToXml("[true, true]"));
 
@@ -1842,9 +1847,9 @@ public final class JsonTreeBuilderTest extends TestCase {
     return doc.html();
   }
 
-    /** https://github.com/magicprinc/JSONTestSuite */
+    /* https://github.com/magicprinc/JSONTestSuite */
     public void testFullJSONTestSuiteOnline() throws Exception {
-        String[] testSrcs = {"https://github.com/magicprinc/JSONTestSuite/tree/master/test_parsing",
+         String[] testSrcs = {"https://github.com/magicprinc/JSONTestSuite/tree/master/test_parsing",
                 "https://github.com/magicprinc/JSONTestSuite/tree/master/test_transform"};
 
         for (String u : testSrcs) {

@@ -1,39 +1,55 @@
-# Ignore Idea project-specific directory
-.idea/
-# Ignore Gradle project-specific cache directory
+# Gradle 
 .gradle/
 
-.settings/
-
-/shelf/
-/workspace.xml
-
-# Ignore Gradle/IDEA/Maven/etc build output directory
-out/
 build/
-classes/
-target/
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 dist/
 
-/logs/*
+target/
 
-
-*.iml
+# IntelliJ IDEA
+.idea/
 *.ipr
+*.iml
 *.iws
-*.class
+
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# Eclipse
 .classpath
 .project
-*Thrash*
+.settings
+classes/
+
+# LOGs
+*.log
+logs/
+!**/src/main/**/logs/
+!**/src/test/**/logs/
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+replay_pid*
+
+# mac
+.DS_Store 
+._.DS_Store
+
 *.tmp
+*.bak
 *.$$$
 *.~*
 *.*~
 *.orig
 *.swp
 
+*.class
+*.war
+*.ear
 
-gradle/
-gradlew.bat
-gradlew
+*.sqlite*

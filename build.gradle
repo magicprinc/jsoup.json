@@ -1,37 +1,60 @@
 plugins {
   id 'java-library'
+  id 'idea'
   id 'maven-publish'
+  id "net.ltgt.errorprone" version "2.+"
+//  id "org.checkerframework" version "+"
 }
-
-group = 'one.deltaf.json4jsoup'
-version = '1.0'
-
-compileJava.options.encoding = "UTF-8"
-compileTestJava.options.encoding = "UTF-8"
-javadoc.options.encoding = 'UTF-8'
-
-compileJava {
-  sourceCompatibility = '1.8'
-  targetCompatibility = '1.8'
-}
+apply plugin: 'net.ltgt.errorprone'
+//apply plugin: 'org.checkerframework'
 
 repositories {
   mavenCentral()
 }
 
+sourceCompatibility = '1.8'
+
+gradle.projectsEvaluated {
+  tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
+    options.release.set(8) // javac --release 8
+    options.deprecation = true
+    options.annotationProcessorPath = configurations.errorprone
+
+    options.errorprone {
+      enabled = true
+      disableWarningsInGeneratedCode = true
+      excludedPaths = ".*/build/gen.*/.*"
+      //disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
+    }
+  }
+}
+
+
 dependencies {
+  errorprone "com.google.errorprone:error_prone_core:latest.release"
+
   //works since 1.12, but XML escaping is better and XML is more compact since 1.14.2
   //api vs implementation: jsoup is 100% already declared, if we are used
-  implementation 'org.jsoup:jsoup:1.14.2'
+  implementation 'org.jsoup:jsoup:1.15.3'
 
   testImplementation 'junit:junit:4.+'
   testImplementation 'com.google.code.gson:gson:2.+'
 }
 
+
 test {
   useJUnit()
   maxHeapSize = '256M'
+  enableAssertions = true
+
+  testLogging.showStandardStreams = true // show standard out & err of the test JVM on the console
+
+  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
+  System.setProperty("file.encoding", "UTF-8")
 }
+
 
 // https://docs.gradle.org/current/userguide/publishing_maven.html
 java {
@@ -41,15 +64,25 @@ java {
 
 publishing {
   publications {
-    maven(MavenPublication) {
-      artifactId = 'json4jsoup'
+    maven(MavenPublication) { // artifactId = folder name = 'json4jsoup'
       from components.java
     }
   }
 }
+tasks.withType(GenerateModuleMetadata) {
+  enabled = false // don't generate Gradle's json metadata and warning in pom.xml
+}
 
 javadoc {
+  options.encoding = 'UTF-8'
   if(JavaVersion.current().isJava9Compatible()) {
     options.addBooleanOption('html5', true)
+  }
+}
+
+idea {
+  module {
+    downloadJavadoc = true
+    downloadSources = true
   }
 }
