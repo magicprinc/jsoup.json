@@ -1,5 +1,2 @@
 jdk:
   - openjdk17
-
-install:
-  - ./gradlew clean build -x test --console=plain --continue --warning-mode all --parallel --quiet
