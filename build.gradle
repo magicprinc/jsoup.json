@@ -2,33 +2,27 @@ plugins {
   id 'java-library'
   id 'idea'
   id 'maven-publish'
-  id "net.ltgt.errorprone" version "2.+"
-//  id "org.checkerframework" version "+"
+  id "net.ltgt.errorprone" version "latest.release"
 }
-apply plugin: 'net.ltgt.errorprone'
-//apply plugin: 'org.checkerframework'
-
 repositories {
+	mavenLocal()
   mavenCentral()
 }
+println "[INFO] ${project.group}:${project.name}:$version  ⇒  ${tasks.jar.archiveFileName.get()} # JVM: ${System.getProperty("java.version")}  Gradle: ${gradle.gradleVersion}"
 
-sourceCompatibility = '1.8'
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
+	options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
+	options.release.set(8) // javac --release 8
+	options.deprecation = true
+	options.annotationProcessorPath = configurations.errorprone
 
-gradle.projectsEvaluated {
-  tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-    options.compilerArgs.addAll(['-Xlint:all', '-parameters', '-g', '-Xmaxwarns', '999'])
-    options.release.set(8) // javac --release 8
-    options.deprecation = true
-    options.annotationProcessorPath = configurations.errorprone
-
-    options.errorprone {
-      enabled = true
-      disableWarningsInGeneratedCode = true
-      excludedPaths = ".*/build/gen.*/.*"
-      //disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
-    }
-  }
+	options.errorprone {
+		enabled = true
+		disableWarningsInGeneratedCode = true
+		excludedPaths = ".*/build/gen.*/.*"
+		//disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
+	}
 }
 
 
@@ -37,15 +31,17 @@ dependencies {
 
   //works since 1.12, but XML escaping is better and XML is more compact since 1.14.2
   //api vs implementation: jsoup is 100% already declared, if we are used
-  implementation 'org.jsoup:jsoup:1.15.3'
+  implementation 'org.jsoup:jsoup:1.+'
 
-  testImplementation 'junit:junit:4.+'
+	testImplementation("org.junit.jupiter:junit-jupiter:latest.release")
+	testImplementation("org.junit.vintage:junit-vintage-engine:latest.release")
+
   testImplementation 'com.google.code.gson:gson:2.+'
 }
 
 
 test {
-  useJUnit()
+  useJUnitPlatform()
   maxHeapSize = '256M'
   enableAssertions = true
 
@@ -56,8 +52,7 @@ test {
 }
 
 
-// https://docs.gradle.org/current/userguide/publishing_maven.html
-java {
+java { // https://docs.gradle.org/current/userguide/publishing_maven.html
   withSourcesJar()
   withJavadocJar()
 }
@@ -69,8 +64,8 @@ publishing {
     }
   }
 }
-tasks.withType(GenerateModuleMetadata) {
-  enabled = false // don't generate Gradle's json metadata and warning in pom.xml
+tasks.withType(GenerateModuleMetadata).configureEach {
+	enabled = false // don't generate Gradle's json metadata and warning in pom.xml
 }
 
 javadoc {
@@ -80,9 +75,4 @@ javadoc {
   }
 }
 
-idea {
-  module {
-    downloadJavadoc = true
-    downloadSources = true
-  }
-}
+idea { module { downloadJavadoc = true;	downloadSources = true } }
