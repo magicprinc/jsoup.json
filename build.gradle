@@ -61,18 +61,14 @@ publishing {
   publications {
 		release(MavenPublication) { // artifactId = folder name = 'json4jsoup'
       from components.java
+			suppressPomMetadataWarningsFor('runtimeElements')
     }
   }
-}
-tasks.withType(GenerateModuleMetadata).configureEach {
-	enabled = false // don't generate Gradle's json metadata and warning in pom.xml
 }
 
 javadoc {
   options.encoding = 'UTF-8'
-  if(JavaVersion.current().isJava9Compatible()) {
-    options.addBooleanOption('html5', true)
-  }
+  options.addBooleanOption('html5', true)
 }
 
 idea { module { downloadJavadoc = true;	downloadSources = true } }
