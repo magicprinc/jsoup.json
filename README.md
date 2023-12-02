@@ -1,4 +1,4 @@
-[![Java CI with Gradle](https://github.com/magicprinc/jsoup.json/actions/workflows/gradle.yml/badge.svg)](https://github.com/magicprinc/jsoup.json/actions/workflows/gradle.yml)
+[![Java CI with Gradle](https://github.com/magicprinc/jsoup.json/actions/workflows/gradle.yml/badge.svg)](https://github.com/magicprinc/jsoup.json/actions/workflows/gradle.yml) [![](https://jitpack.io/v/magicprinc/jsoup.json.svg)](https://jitpack.io/#magicprinc/jsoup.json)
 # json4jsoup: JSON parser for jsoup (Java HTML Parser)
 
 **jsoup** is a Java library for working with real-world HTML. It provides a very convenient API for extracting and manipulating data, using the best of DOM, CSS, and jquery-like methods.
