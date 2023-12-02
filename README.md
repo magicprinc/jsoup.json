@@ -13,8 +13,6 @@ All JSON elements are converted one-to-one into three XML tags (obj, arr, val), 
 Compatible with all versions of jsoup since 1.12.1.
 No extra dependencies!
 
-[Download](https://github.com/magicprinc/jsoup.json/releases/latest)
-
 [**example.json**](src/test/resources/example.json)
 ```json
 /*
