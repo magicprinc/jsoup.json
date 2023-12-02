@@ -146,4 +146,14 @@ I am here: src\test\resources/example.json *-->
 </arr></obj>
 ```
 
-More examples are available in 135 unit-tests in [org.jsoup.parser.JsonTreeBuilderTest](/src/test/java/org/jsoup/parser/JsonTreeBuilderTest.java)
+More examples are available in 135 unit-tests in [org.jsoup.parser.JsonTreeBuilderTest](/src/test/java/org/jsoup/parser/JsonTreeBuilderTest.java).
+
+Simple example: [ExampleTest](/src/test/java/example/ExampleTest.java)
+
+## Download
+
+```gradle
+dependencies {
+  implementation 'com.github.magicprinc:jsoup.json:1.17.1'
+}
+```
