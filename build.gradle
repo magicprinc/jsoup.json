@@ -72,3 +72,14 @@ javadoc {
 }
 
 idea { module { downloadJavadoc = true;	downloadSources = true } }
+
+jar {
+	from generatePomFileForReleasePublication {
+		rename('pom-default.xml', "META-INF/maven/${project.group}/${project.name}/pom.xml")
+	}
+}
+
+tasks.withType(AbstractArchiveTask).configureEach {
+	preserveFileTimestamps = false
+	reproducibleFileOrder = true
+}
