@@ -7,21 +7,25 @@ plugins {
 repositories {
 	mavenLocal()
   mavenCentral()
+  maven { url = "https://jitpack.io" }
 }
 println "[INFO] ${project.group}:${project.name}:$version  ⇒  ${tasks.jar.archiveFileName.get()} # JVM: ${System.getProperty("java.version")}  Gradle: ${gradle.gradleVersion}"
 
 tasks.withType(JavaCompile).configureEach {
-	options.encoding = 'UTF-8'
-	options.compilerArgs.addAll(['-Xlint:all,-serial', '-parameters', '-g', '-Xmaxwarns', '999'])
-	options.release.set(8) // javac --release 8
+	options.encoding = "UTF-8" // = compileJava.options.encoding = "UTF-8"
+	options.compilerArgs.addAll(["-Xlint:all,-serial", "-parameters"])
+	options.release.set(17)// javac --release 7→8..23+
 	options.deprecation = true
-	options.annotationProcessorPath = configurations.errorprone
+	options.debug = true
 
 	options.errorprone {
 		enabled = true
 		disableWarningsInGeneratedCode = true
-		excludedPaths = ".*/build/gen.*/.*"
-		//disable("ParameterName") disable("UnusedVariable") errorproneArgs = ["--illegal-access=warn"]
+		excludedPaths = ".*/(generated|test).*/.*"
+		disable("UnusedVariable")
+		disable("MissingSummary")
+		disable("StringConcatToTextBlock")
+		errorproneArgs = ["-XepExcludedPaths:.*/test/.*"]
 	}
 }
 
@@ -47,7 +51,6 @@ test {
 
   testLogging.showStandardStreams = true // show standard out & err of the test JVM on the console
 
-  System.setProperty("slf4j.detectLoggerNameMismatch", "true")
   System.setProperty("file.encoding", "UTF-8")
 }
 
@@ -56,7 +59,7 @@ java { // https://docs.gradle.org/current/userguide/publishing_maven.html
   withSourcesJar()
   withJavadocJar()
 }
-
+// https://docs.gradle.org/current/userguide/publishing_maven.html
 publishing {
   publications {
 		release(MavenPublication) { // artifactId = folder name = 'json4jsoup'
@@ -66,10 +69,6 @@ publishing {
   }
 }
 
-javadoc {
-  options.encoding = 'UTF-8'
-  options.addBooleanOption('html5', true)
-}
 
 idea { module { downloadJavadoc = true;	downloadSources = true } }
 
