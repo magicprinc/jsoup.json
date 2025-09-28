@@ -21,6 +21,9 @@ import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.LeafNode;
+import org.jsoup.nodes.Node;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,7 +168,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     DANGLING_NAME
   }
 
-  protected enum VALUE_CLASS {
+  enum VALUE_CLASS {
     SINGLE_QUOTED("apos quoted str", "apos quoted num"),
     DOUBLE_QUOTED("quot quoted str", "quot quoted num"),
     UNQUOTED("unquoted str", "unquoted num");
@@ -181,19 +184,19 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     public String num () { return cssClassNumeric;}
   }
 
-  static final Token.EndTag endTagObj = new Token.EndTag();
-  static final Token.EndTag endTagArr = new Token.EndTag();
+	public JsonTreeBuilder () {
+		endTagObj = new Token.EndTag(this);
+		endTagArr = new Token.EndTag(this);
+		endTagObj.name(STR_OBJ);
+		endTagArr.name(STR_ARR);
+	}//new
 
-  static {
-    endTagObj.name(STR_OBJ);
-    endTagArr.name(STR_ARR);
-  }
-
-  boolean qclass = true;
-
+	final Token.EndTag endTagObj;
+	final Token.EndTag endTagArr;
+	boolean qclass = true;
   final ArrayList<String> comment = new ArrayList<>();
   private final StringBuilder builder = new StringBuilder(2000);
-  String currentName;
+  @Nullable String currentName;
   SCOPE currentScope = SCOPE.EMPTY_DOCUMENT;
   int tokensCount;//statistics for tests
 
@@ -365,16 +368,15 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
       return NEXT_TOKEN.UNKNOWN; // Don't match trues, falsey or nullsoft!
     }
 
-    if (!isLiteral(reader.current()) || reader.current() == EOF) {
+    if (!isLiteral(reader.current()) || reader.current() == EOF)
       return peeking; // We've found the keyword followed either by EOF or by a non-literal character
-    }
 
     reader.rewindToMark();
     return NEXT_TOKEN.UNKNOWN; // Don't match trues, falsey or nullsoft
   }
 
   /** not literals: / \ ; # = { } [ ] : , space \t \f \r \n */
-  boolean isLiteral(char c) {
+  boolean isLiteral (char c) {
     int contains = Arrays.binarySearch(NON_LITERALS, c);
     return contains < 0;
   }
@@ -388,7 +390,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
    */
   String collectQuoted(char quote) {
     builder.setLength(0);
-    while (true) {
+    while (true){
       String s = reader.consumeToAny(quote, '\\');
       builder.append(s);
 
@@ -399,7 +401,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
 
       } else if (c == '\\') {
         c = readEscapeCharacter();
-        if (c != EOF) { // \ isn't at the end of file
+        if (c != EOF){ // \ isn't at the end of file
           builder.append(c);
         }
       } else {//just end of buffer
@@ -416,14 +418,12 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
 
       boolean found = reader.matchConsume(seq); //seq, EOF or end-of-buffer
 
-      if (found || reader.isEmpty()) {
-        return builder.toString();
-      }
+      if (found || reader.isEmpty())
+        	return builder.toString();
     }//wloop
   }
 
   static final char[] NON_LITERALS = new char[16];
-
   static {
     int i = 0;
     NON_LITERALS[i++] = '/';
@@ -476,13 +476,11 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
   char nextNonWhitespace() {
     while (true) {
       char c = reader.consume();
-      if (c == ' ' || c == '\r' || c == '\t' || c == '\n' || c == '\f') {
-        continue;
-      }
+      if (c == ' ' || c == '\r' || c == '\t' || c == '\n' || c == '\f')
+        	continue;
 
-      if (c == EOF) {
-        return EOF;
-      }
+      if (c == EOF)
+        	return EOF;
 
       if (c == '/') {
         switch (reader.current()) {
@@ -666,30 +664,34 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     }
   }
 
-  void insertStartTag(String tagName) {
-    Tag tag = Tag.valueOf(tagName, settings);
+	/// @see #insertLeafNode(LeafNode)
+	@Override
+	protected void insertNode (Node node) {
+		currentElement().appendChild(node);
+		//todo onNodeInserted(node);
+	}
 
-    Element el;
-    if (currentName != null) {
-      Attributes attr = new Attributes();
+	/// @see XmlTreeBuilder#insertElementFor(Token.StartTag)
+  void insertStartTag (String tagName) {
+		var tag = new Token.StartTag(this);
+    if (currentName != null){
+      var attr = new Attributes();
       attr.put(STR_ID, currentName);
       currentName = null;
-      el = new Element(tag, baseUri, attr);
+			tag.nameAttr(tagName, attr);
     } else {
-      el = new Element(tag, baseUri);
+			tag.name(tagName);// × settings
     }
-
-    insertNode(el);
-    stack.add(el);
+    insertElementFor(tag);
   }
 
   void insertBoolean(boolean value) {
     Tag tag = Tag.valueOf(STR_VAL, settings);
 
-    Attributes attr = new Attributes();
-    Element el = new Element(tag, baseUri, attr);
+    var attr = new Attributes();
+    var el = new Element(tag, baseUri, attr);
 
-    if (currentName != null) {
+    if (currentName != null){
       attr.put(STR_ID, currentName);
       currentName = null;
     }
@@ -704,7 +706,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     insertNode(el);
   }
 
-  void insertNull() {
+  void insertNull () {
     Tag tag = Tag.valueOf(STR_VAL, settings);
     tag.setSelfClosing();
 
@@ -723,17 +725,16 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
   void insertVal(String value, VALUE_CLASS typeClass) {
     Tag tag = Tag.valueOf(STR_VAL, settings);
 
-    Attributes attr = new Attributes();
+    var attr = new Attributes();
     if (currentName != null) {
       attr.put(STR_ID, currentName);
       currentName = null;
     }
-    Element el = new Element(tag, baseUri, attr);
-    if (value.length() > 0) {
-      el.appendText(value);
-    } else {
-      tag.setSelfClosing();
-    }
+    var el = new Element(tag, baseUri, attr);
+    if (value.length() > 0)
+      	el.appendText(value);
+    else
+      	tag.setSelfClosing();
     addMetaDataToValue(el, value, typeClass);
     insertNode(el);
   }
@@ -756,9 +757,8 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
   }
 
   void insertComments() {
-    for (String s : comment) {
-      insertNode(new Comment(s));
-    }
+    for (String s : comment)
+      	insertNode(new Comment(s));
     comment.clear();
   }
 
@@ -766,7 +766,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     Tag tag = Tag.valueOf(STR_UNK, settings);
     tag.setSelfClosing();
 
-    Attributes attr = new Attributes();
+    var attr = new Attributes();
 
     if (currentName != null) {
       attr.put(STR_ID, currentName);
@@ -785,16 +785,14 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
   }
 
   protected boolean isNumeric(CharSequence s) {
-    int i = 0, len = s.length(), e = 0, dec = 0;
-    char c;
+    int i = 0, len = s.length(), e = 0, dec = 0;  char c;
     //1.skip left spaces + -
     while (i < len) {
       c = s.charAt(i);
-      if (isSpace(c) || c == '+' || c == '-') {
-        i++;
-      } else {
-        break;
-      }
+      if (isSpace(c) || c == '+' || c == '-')
+        	i++;
+      else
+        	break;
     }
     //2.skip right spaces
     while (i < len) {
@@ -855,7 +853,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     return true;
   }
 
-  protected boolean isSpace(char c) {
+  static boolean isSpace (int c) {
     return c <= ' ' || Character.isSpaceChar(c) || Character.isWhitespace(c);
   }
 
@@ -868,7 +866,7 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
    * @see #jsonParser()
    */
   public static Parser jsonParser(boolean extraInfoInAttrs) {
-    JsonTreeBuilder treeBuilder = new JsonTreeBuilder();
+    var treeBuilder = new JsonTreeBuilder();
     treeBuilder.qclass = extraInfoInAttrs;
     return new Parser(treeBuilder);
   }

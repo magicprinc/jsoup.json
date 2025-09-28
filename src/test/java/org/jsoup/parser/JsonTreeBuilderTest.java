@@ -19,7 +19,6 @@ package org.jsoup.parser;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import junit.framework.TestCase;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Comment;
 import org.jsoup.nodes.Document;
@@ -27,6 +26,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.parser.JsonTreeBuilder.NEXT_TOKEN;
 import org.jsoup.select.Elements;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,78 +48,88 @@ import java.util.Map.Entry;
 import static java.nio.charset.StandardCharsets.*;
 import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
 import static org.jsoup.parser.JsonTreeBuilder.jsonToXml;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings({"EmptyCatchBlock", "ProhibitedExceptionCaught",
-    "SingleCharacterStringConcatenation","UnnecessarilyQualifiedStaticallyImportedElement",
+	"UnnecessarilyQualifiedStaticallyImportedElement",
     "ResultOfObjectAllocationIgnored","JUnitTestMethodWithNoAssertions"})
-public final class JsonTreeBuilderTest extends TestCase {
-
-  public void testReadArray() {
+final class JsonTreeBuilderTest {
+	@Test
+	void testReadArray () {
     String json = "[true, true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testReadEmptyArray() {
+	@Test
+	void testReadEmptyArray () {
     String json = "[]";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testReadObject() {
+	@Test
+	void testReadObject () {
     String json = "{\"a\": \"android\", \"b\": \"banana\"}";
     String xml = "<obj><val id=\"a\">android</val><val id=\"b\">banana</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testReadEmptyObject() {
+	@Test
+	void testReadEmptyObject () {
     String json = "{}";
     String xml = "<obj></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipArray() {
+	@Test
+	void testSkipArray () {
     String json = "{\"a\": [\"one\", \"two\", \"three\"], \"b\": 123}";
     String xml = "<obj><arr id=\"a\"><val>one</val><val>two</val><val>three</val></arr><val id=\"b\">123</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipObject() {
+	@Test
+	void testSkipObject () {
     String json = "{\"a\": { \"c\": [], \"d\": [true, true, {}] }, \"b\": \"banana\"}";
     String xml = "<obj><obj id=\"a\"><arr id=\"c\"></arr><arr id=\"d\"><val class=\"bool\">true</val><val class=\"bool\">true</val><obj></obj></arr></obj><val id=\"b\">banana</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipObjectAfterPeek() {
+	@Test
+	void testSkipObjectAfterPeek () {
     String json = "{" + "  \"one\": { \"num\": 1 }"
         + ", \"two\": { \"num\": 2 }" + ", \"three\": { \"num\": 3 }" + "}";
     String xml = "<obj><obj id=\"one\"><val id=\"num\">1</val></obj>" +
         "<obj id=\"two\"><val id=\"num\">2</val></obj><obj id=\"three\"><val id=\"num\">3</val></obj></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipInteger() {
+	@Test
+	void testSkipInteger () {
     String json = "{\"a\":123456789,\"b\":-123456789}";
     String xml = "<obj><val id=\"a\">123456789</val><val id=\"b\">-123456789</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipDouble() {
+	@Test
+	void testSkipDouble () {
     String json = "{\"a\":-123.456e-789,\"b\":123456789.0}";
     String xml = "<obj><val id=\"a\">-123.456e-789</val><val id=\"b\">123456789.0</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testHelloWorld() {
+	@Test
+	void testHelloWorld () {
     String json = "{\n" +
         "   \"hello\": true,\n" +
         "   \"foo\": [\"world\"]\n" +
@@ -128,11 +138,12 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val id=\"hello\" class=\"bool\">true</val>" +
         "<arr id=\"foo\"><val>world</val></arr>" +
         "</obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testInvalidJsonInput() {
+	@Test
+	void testInvalidJsonInput () {
     String json = "{\n"
         + "   \"h\\ello\": true,\n"
         + "   \"foo\": [\"world\"]\n"
@@ -144,8 +155,9 @@ public final class JsonTreeBuilderTest extends TestCase {
         "</obj>";
     assertEquals(xml, jsonToXml(json));
   }
-  
-  public void testNulls() {
+
+	@Test
+	void testNulls () {
     try {
       jsonToXml(null);
       fail();
@@ -153,14 +165,16 @@ public final class JsonTreeBuilderTest extends TestCase {
     }
   }
 
-  public void testEmptyString() {
+	@Test
+	void testEmptyString () {
     String json = "";
     String xml = "";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testCharacterUnescaping() {
+	@Test
+	void testCharacterUnescaping () {
     String json = "[\"a\","
         + "\"a\\\"\","
         + "\"\\\"\","
@@ -201,39 +215,44 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val>&#x19;</val>"+//"\u0019"
         "<val>\u20AC</val>"+//"\u20AC"
         "</arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testUnescapingInvalidCharacters() {
+	@Test
+	void testUnescapingInvalidCharacters () {
     String json = "[\"\\u000g\"]";
     //gson: expected NumberFormatException: \\u000g
     String xml = "<arr><val>&#x0;g</val></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testUnescapingTruncatedCharacters() {
+	@Test
+	void testUnescapingTruncatedCharacters () {
     String json = "[\"\\u000";
     //gson: expected IOException = MalformedJsonException: Unterminated escape sequence at line 1 column 5 path $[0]
     String xml = "<arr><val>&#x0;</val></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testUnescapingTruncatedSequence() {
+	@Test
+	void testUnescapingTruncatedSequence () {
     String json = "[\"\\";
     //gson: JsonSyntaxException: com.google.gson.stream.MalformedJsonException: Unterminated escape sequence at line 1 column 4 path $[0]
     String xml = "<arr><val /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testIntegersWithFractionalPartSpecified() {
+	@Test
+	void testIntegersWithFractionalPartSpecified () {
     String json = "[-1,+1.0,1.000]";
     String xml = "<arr><val>-1</val><val>+1.0</val><val>1.000</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testDoubles() {
+	@Test
+	void testDoubles () {
     String json = "[-0.0,"
         + "1.0,"
         + "1.7976931348623157E308,"
@@ -252,78 +271,88 @@ public final class JsonTreeBuilderTest extends TestCase {
         "<val>2.2250738585072014E-308</val>" +
         "<val>3.141592653589793</val>" +
         "<val>2.718281828459045</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictNonFiniteDoubles() {
+	@Test
+	void testStrictNonFiniteDoubles () {
     String json = "[NaN]";
     String xml = "<arr><val>NaN</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictQuotedNonFiniteDoubles() {
+	@Test
+	void testStrictQuotedNonFiniteDoubles () {
     String json = "[\"NaN\"]";
     String xml = "<arr><val>NaN</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientNonFiniteDoubles() {
+	@Test
+	void testLenientNonFiniteDoubles () {
     String json = "[NaN, -Infinity, Infinity]";
     String xml = "<arr><val>NaN</val><val>-Infinity</val><val>Infinity</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientQuotedNonFiniteDoubles() {
+	@Test
+	void testLenientQuotedNonFiniteDoubles () {
     String json = "[\"NaN\", \"-Infinity\", \"Infinity\"]";
     String xml = "<arr><val>NaN</val><val>-Infinity</val><val>Infinity</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictNonFiniteDoublesWithSkipValue() {
+	@Test
+	void testStrictNonFiniteDoublesWithSkipValue () {
     String json = "[NaN]";
     String xml = "<arr><val>NaN</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLongs() {
+	@Test
+	void testLongs () {
     String json = "[0,0,0,"
         + "1,1,1,"
         + "-1,-1,-1,"
         + "-9223372036854775808,"
         + "9223372036854775807]";
     String xml = "<arr><val>0</val><val>0</val><val>0</val><val>1</val><val>1</val><val>1</val><val>-1</val><val>-1</val><val>-1</val><val>-9223372036854775808</val><val>9223372036854775807</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testNumberWithOctalPrefix() {
+	@Test
+	void testNumberWithOctalPrefix () {
     String json = "[01]";
     String xml = "<arr><val>01</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testBooleans() {
+	@Test
+	void testBooleans () {
     String json = "[true,false]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">false</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testPeekingUnquotedStringsPrefixedWithBooleans() {
+	@Test
+	void testPeekingUnquotedStringsPrefixedWithBooleans () {
     String json = "[truey]";
     String xml = "<arr><val>truey</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testMalformedNumbers() {
+	@Test
+	void testMalformedNumbers () {
     assertNotANumber("-");
     assertNotANumber(".");
 
@@ -368,31 +397,34 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(s, doc.text());
   }
 
-  public void testPeekingUnquotedStringsPrefixedWithIntegers() {
+	@Test
+	void testPeekingUnquotedStringsPrefixedWithIntegers () {
     String json = "[12.34e5x]";
     String xml = "<arr><val>12.34e5x</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<arr><val class=\"unquoted str\">12.34e5x</val></arr>";
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testPeekLongMinValue() {
+	@Test
+	void testPeekLongMinValue () {
     String json = "[-9223372036854775808]";
     String xml = "<arr><val>-9223372036854775808</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "-9223372036854775808";
     xml = "<val>-9223372036854775808</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testPeekLongMaxValue() {
+	@Test
+	void testPeekLongMaxValue () {
     String json = "[9223372036854775807]";
     String xml = "<arr><val>9223372036854775807</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<arr><val class=\"unquoted num\">9223372036854775807</val></arr>";
     assertEquals(xml, jsonToDetailedXml(json));
@@ -401,24 +433,27 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testLongLargerThanMaxLongThatWrapsAround() {
+	@Test
+	void testLongLargerThanMaxLongThatWrapsAround () {
     String json = "[22233720368547758070]";
     String xml = "<arr><val>22233720368547758070</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLongLargerThanMinLongThatWrapsAround() {
+	@Test
+	void testLongLargerThanMinLongThatWrapsAround () {
     String json = "[-22233720368547758070]";
     String xml = "<arr><val>-22233720368547758070</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
-  
-  public void testNegativeZero() {
+
+	@Test
+	void testNegativeZero () {
     String json = "[--0]";
     String xml = "<arr><val>--0</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<arr><val class=\"unquoted num\">--0</val></arr>";
     assertEquals(xml, jsonToDetailedXml(json));
@@ -428,17 +463,19 @@ public final class JsonTreeBuilderTest extends TestCase {
    * This test fails because there's no double for 9223372036854775808, and our
    * long parsing uses Double.parseDouble() for fractional values.
    */
-  public void testPeekLargerThanLongMaxValue() {
+	@Test
+	void testPeekLargerThanLongMaxValue () {
     String json = "[9223372036854775808]";
     String xml = "<arr><val>9223372036854775808</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testPeekLargerThanLongMinValue() {
+	@Test
+	void testPeekLargerThanLongMinValue () {
     String json = "[-9223372036854775809]";
     String xml = "<arr><val>-9223372036854775809</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
@@ -446,45 +483,51 @@ public final class JsonTreeBuilderTest extends TestCase {
    * This test fails because there's no double for 9223372036854775806, and
    * our long parsing uses Double.parseDouble() for fractional values.
    */
-  public void testHighPrecisionLong() {
+	@Test
+	void testHighPrecisionLong () {
     String json = "[9223372036854775806.000]";
     String xml = "<arr><val>9223372036854775806.000</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testPeekMuchLargerThanLongMinValue() {
+	@Test
+	void testPeekMuchLargerThanLongMinValue () {
     String json = "[-92233720368547758080]";
     String xml = "<arr><val>-92233720368547758080</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testQuotedNumberWithEscape() {
+	@Test
+	void testQuotedNumberWithEscape () {
     String json = "[\"12\u00334\"]";
     String xml = "<arr><val>1234</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<arr><val class=\"quot quoted num\">1234</val></arr>";
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testMixedCaseLiterals() {
+	@Test
+	void testMixedCaseLiterals () {
     String json = "[True,TruE,False,FALSE,NULL,nulL]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">true</val>" +
         "<val class=\"bool\">false</val><val class=\"bool\">false</val>" +
         "<val class=\"null\" /><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testMissingValue() {
+	@Test
+	void testMissingValue () {
     String json = "{\"a\":}";//MalformedJsonException: Expected value at line 1 column 6 path $.a
     String xml = "<obj><val id=\"a\" class=\"null\" /></obj>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testPrematureEndOfInput() {
+	@Test
+	void testPrematureEndOfInput () {
     String json = "{\"a\":true,";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
     //gson: JsonSyntaxException: EOFException: End of input at line 1 column 11 path $.a
@@ -508,7 +551,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     }
   }
 
-  public void testPrematurelyClosed() throws IOException {
+	@Test
+	void testPrematurelyClosed () throws IOException {
     final byte[] ba = "{\"a\":[]}".getBytes(UTF_8);
 
     FakeInputStream is = new FakeInputStream(ba, 0);
@@ -531,50 +575,55 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml.replace("id=\"\"", "id=\"a\""), doc.html());
   }
 
-  public void testNextFailuresDoNotAdvance() {
+	@Test
+	void testNextFailuresDoNotAdvance () {
     String json = "{\"a\":true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testIntegerMismatchFailuresDoNotAdvance() {
+	@Test
+	void testIntegerMismatchFailuresDoNotAdvance () {
     String json = "[1.5]";
     String xml = "<arr><val>1.5</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringNullIsNotNull() {
+	@Test
+	void testStringNullIsNotNull () {
     String json = "[\"null\"]";
     String xml = "<arr><val>null</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testNullLiteralIsNotAString() {
+	@Test
+	void testNullLiteralIsNotAString () {
     String json = "[null]";
     String xml = "<arr><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testNameValueSeparator() {
+	@Test
+	void testNameValueSeparator () {
     String json = "{\"a\"=true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{'a'=>true}";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{a=>true}";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{a:true}";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{a true}";
@@ -591,35 +640,38 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictNameValueSeparatorWithSkipValue() {
+	@Test
+	void testStrictNameValueSeparatorWithSkipValue () {
     String json = "{\"a\"=true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{\"a\"=>true}";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testCommentsInStringValue() {
+	@Test
+	void testCommentsInStringValue () {
     String json = "[\"// comment\"]";
     String xml = "<arr><val>// comment</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{\"a\":\"#someComment\"}";
     xml = "<obj><val id=\"a\">#someComment</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "{\"#//a\":\"#some //Comment\"}";
     xml = "<obj><val id=\"#//a\">#some //Comment</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictComments () {
+	@Test
+	void testStrictComments () {
     String json = "[// comment \n true]";
     String xml = "<arr><!-- comment --><val class=\"bool\">true</val></arr>";
     assertEquals(xml, jsonToXml(json));
@@ -631,7 +683,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientComments() {
+	@Test
+	void testLenientComments () {
     String json = "[// comment \n true]";
     String xml = "<arr><!-- comment --><val class=\"bool\">true</val></arr>";
     assertEquals(xml, jsonToXml(json));
@@ -643,7 +696,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictCommentsWithSkipValue() {
+	@Test
+	void testStrictCommentsWithSkipValue () {
     String json = "[// comment \n true]";
     String sameXml = "<arr><!-- comment --><val class=\"bool\">true</val></arr>";
     String xml = sameXml;
@@ -677,308 +731,339 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals("<!--"+bigData+"-->", jsonToXml("\r\n\t //"+bigData));
   }
 
-  public void testStrictUnquotedNames() {
+	@Test
+	void testStrictUnquotedNames () {
     String json = "{a:true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<obj><val id=\"a\" class=\"bool\" value=\"true\">true</val></obj>";
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testLenientUnquotedNames() {
+	@Test
+	void testLenientUnquotedNames () {
     String json = "{a:true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictUnquotedNamesWithSkipValue() {
+	@Test
+	void testStrictUnquotedNamesWithSkipValue () {
     String json = "{a:true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSingleQuotedNames() {
+	@Test
+	void testStrictSingleQuotedNames () {
     String json = "{'a':true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientSingleQuotedNames() {
+	@Test
+	void testLenientSingleQuotedNames () {
     String json = "{'a':true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSingleQuotedNamesWithSkipValue() {
+	@Test
+	void testStrictSingleQuotedNamesWithSkipValue () {
     String json = "{'a':true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictUnquotedStrings() {
+	@Test
+	void testStrictUnquotedStrings () {
     String json = "[a]";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictUnquotedStringsWithSkipValue() {
+	@Test
+	void testStrictUnquotedStringsWithSkipValue () {
     String json = "[a]";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientUnquotedStrings() {
+	@Test
+	void testLenientUnquotedStrings () {
     String json = "[a]";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSingleQuotedStrings() {
+	@Test
+	void testStrictSingleQuotedStrings () {
     String json = "['a']";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<arr><val class=\"apos quoted str\">a</val></arr>";
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testLenientSingleQuotedStrings() {
+	@Test
+	void testLenientSingleQuotedStrings () {
     String json = "['a']";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSingleQuotedStringsWithSkipValue() {
+	@Test
+	void testStrictSingleQuotedStringsWithSkipValue () {
     String json = "['a']";
     String xml = "<arr><val>a</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));  }
 
-  public void testStrictSemicolonDelimitedArray() {
+	@Test
+	void testStrictSemicolonDelimitedArray () {
     String json = "[true;true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientSemicolonDelimitedArray() {
+	@Test
+	void testLenientSemicolonDelimitedArray () {
     String json = "[true;true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSemicolonDelimitedArrayWithSkipValue() {
+	@Test
+	void testStrictSemicolonDelimitedArrayWithSkipValue () {
     String json = "[true;true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true  ; true]";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true true]";//MalformedJsonException: Unterminated array at line 1 column 8 path $[1]
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSemicolonDelimitedNameValuePair() {
+	@Test
+	void testStrictSemicolonDelimitedNameValuePair () {
     String json = "{\"a\":true;\"b\":true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val><val id=\"b\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientSemicolonDelimitedNameValuePair() {
+	@Test
+	void testLenientSemicolonDelimitedNameValuePair () {
     String json = "{\"a\":true;\"b\":true}";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val><val id=\"b\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictSemicolonDelimitedNameValuePairWithSkipValue() {
+	@Test
+	void testStrictSemicolonDelimitedNameValuePairWithSkipValue () {
     String json = "\uFfFe{\"a\":true;\"b\"  :  true;;;;;;;;;;;;;;;;;;;;,;,;,;};";
     String xml = "<obj><val id=\"a\" class=\"bool\">true</val><val id=\"b\" class=\"bool\">true</val></obj>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictUnnecessaryArraySeparators() {
+	@Test
+	void testStrictUnnecessaryArraySeparators () {
     String json = "[true,,true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,true]";
     xml = "<arr><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true,]";
     xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,]";
     xml = "<arr><val class=\"null\" /><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientUnnecessaryArraySeparators() {
+	@Test
+	void testLenientUnnecessaryArraySeparators () {
     String json = "[true,,true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,true]";
     xml = "<arr><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true,]";
     xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,]";
     xml = "<arr><val class=\"null\" /><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictUnnecessaryArraySeparatorsWithSkipValue() {
+	@Test
+	void testStrictUnnecessaryArraySeparatorsWithSkipValue () {
     String json = "[true,,true]";
     String xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,true]";
     xml = "<arr><val class=\"null\" /><val class=\"bool\">true</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true,]";
     xml = "<arr><val class=\"bool\">true</val><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[,]";
     xml = "<arr><val class=\"null\" /><val class=\"null\" /></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictMultipleTopLevelValues() {
+	@Test
+	void testStrictMultipleTopLevelValues () {
     String json = "[] []";
     String xml = "<arr></arr><arr></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientMultipleTopLevelValues() {
+	@Test
+	void testLenientMultipleTopLevelValues () {
     String json = "[] true {}";
     String xml = "<arr></arr><val class=\"bool\">true</val><obj></obj>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictMultipleTopLevelValuesWithSkipValue() {
+	@Test
+	void testStrictMultipleTopLevelValuesWithSkipValue () {
     String json = "[] []";
     String xml = "<arr></arr><arr></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testTopLevelValueTypes() {
+	@Test
+	void testTopLevelValueTypes () {
     String json = "true";
     String xml = "<val class=\"bool\">true</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "false";
     xml = "<val class=\"bool\">false</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "null";
     xml = "<val class=\"null\" />";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "123 ";
     xml = "<val>123</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "123.4";
     xml = "<val>123.4</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "\"a\"";
     xml = "<val>a</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testTopLevelValueTypeWithSkipValue() {
+	@Test
+	void testTopLevelValueTypeWithSkipValue () {
     String json = "true";
     String xml = "<val class=\"bool\">true</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictNonExecutePrefix() {
+	@Test
+	void testStrictNonExecutePrefix () {
     String json = ")]}'\n []";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictNonExecutePrefixWithSkipValue() {
+	@Test
+	void testStrictNonExecutePrefixWithSkipValue () {
     String json = ")]}'\n []";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "\t\n )]}'\n []";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientNonExecutePrefix() {
+	@Test
+	void testLenientNonExecutePrefix () {
     String json = ")]}'\n []";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "\n\n\r)]}'\n []";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "\uFFFE\n\n\r)]}'\n []";
     assertEquals(xml, jsonToXml(json));
 
     json = "\uFEFF\n\n\r)]}'\n []";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientNonExecutePrefixWithLeadingWhitespace() {
+	@Test
+	void testLenientNonExecutePrefixWithLeadingWhitespace () {
     String json = "\r\n \t)]}'\n []";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientPartialNonExecutePrefix() {
+	@Test
+	void testLenientPartialNonExecutePrefix () {
     String json = ")]}' []";
     String xml = "<val>)</val>" +
         "<unk pos=\"1\" char=\"]\" hex=\"5d\" scope=\"NONEMPTY_DOCUMENT\" stack=\"1\" tokens=\"2\" />" +
@@ -993,24 +1078,27 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testBomIgnoredAsFirstCharacterOfDocument() {
+	@Test
+	void testBomIgnoredAsFirstCharacterOfDocument () {
     String json = "\ufEff[]";
     String xml = "<arr></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
     json = "\uffFe[]";
     xml = "<arr></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testBomForbiddenAsOtherCharacterInDocument() {
+	@Test
+	void testBomForbiddenAsOtherCharacterInDocument () {
     String json = "[\ufeff]";
     String xml = "<arr><val>﻿</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPosition() {
+	@Test
+	void testFailWithPosition () {
     //gson: Expected value at line 6 column 5 path $[1]
     String json = "[\n\n\n\n\n\"a\",}]";
     String xml = "<arr><val>a</val><val class=\"null\" /></arr><unk pos=\"11\" char=\"]\" hex=\"5d\" " +
@@ -1018,7 +1106,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionGreaterThanBufferSize() {
+	@Test
+	void testFailWithPositionGreaterThanBufferSize () {
     String spaces = repeat(' ', 123456);
     String json = "[\n\n"+spaces+"\n\n\n\"a\",}]";//Expected value at line 6 column 5 path $[1]
     String xml = "<arr><val>a</val><val class=\"null\" /></arr>" +
@@ -1026,52 +1115,60 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionOverSlashSlashEndOfLineComment() {
+	@Test
+	void testFailWithPositionOverSlashSlashEndOfLineComment () {
     String json = "\n// foo\n\n//bar\r\n[\"a\",}";//Expected value at line 5 column 6 path $[1]
     String xml = "<!-- foo--><!--bar\r--><arr><val>a</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionOverHashEndOfLineComment() {
+	@Test
+	void testFailWithPositionOverHashEndOfLineComment () {
     String json = "\n# foo\n\n#bar\r\n[\"a\",}";//Expected value at line 5 column 6 path $[1]
     String xml = "<!-- foo--><!--bar\r--><arr><val>a</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionOverCStyleComment() {
+	@Test
+	void testFailWithPositionOverCStyleComment () {
     String json = "\n\n/* foo\n*\n*\r\nbar */[\"a\",}";//
     String xml = "<!-- foo\n*\n*\r\nbar --><arr><val>a</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionOverQuotedString () {
+	@Test
+	void testFailWithPositionOverQuotedString () {
     String json = "[\"foo\nbar\r\nbaz\n\",\n  }";//Expected value at line 5 column 3 path $[1]
     String xml = "<arr><val>foo\nbar\r\nbaz\n</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionOverUnquotedString() {
+	@Test
+	void testFailWithPositionOverUnquotedString () {
     //gson MalformedJsonException: Expected value at line 5 column 2 path $[1]
     String json = "[\n\nabcd\n\n,}";
     String xml = "<arr><val>abcd</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithEscapedNewlineCharacter() {
+	@Test
+	void testFailWithEscapedNewlineCharacter () {
     String json = "[\n\n\"\\\n\n\",}";//Expected value at line 5 column 3 path $[1]
     String xml = "<arr><val>\n\n"+
         "</val><val class=\"null\" /></arr>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionIsOffsetByBom() {
+	@Test
+	void testFailWithPositionIsOffsetByBom () {
     String json = "\ufeff[\"a\",}]";//Expected value at line 1 column 6 path $[1]
     String xml = "<arr><val>a</val><val class=\"null\" /></arr>" +
         "<unk pos=\"7\" char=\"]\" hex=\"5d\" scope=\"NONEMPTY_DOCUMENT\" stack=\"1\" tokens=\"5\" />";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testFailWithPositionDeepPath() {
+	@Test
+	void testFailWithPositionDeepPath () {
     String json = "[1,{\"a\":[2,3,}";//MalformedJsonException: Expected value at line 1 column 14 path $[1].a[2]
     String xml = "<arr><val>1</val>" +
         "<obj><arr id=\"a\"><val>2</val><val>3</val><val class=\"null\" />" +
@@ -1079,23 +1176,26 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictVeryLongNumber() {
+	@Test
+	void testStrictVeryLongNumber () {
     String json = "[0."+repeat('9', 8192)+"]";
     String xml = json.replace("[", "<arr><val>").replace("]", "</val></arr>");
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientVeryLongNumber() {
+	@Test
+	void testLenientVeryLongNumber () {
     String json = "[0."+repeat('9', 8192)+"]";
     String xml = json.replace("[", "<arr><val>").replace("]", "</val></arr>");
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = xml.replace("<val>", "<val class=\"unquoted num\">");
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testVeryLongUnquotedLiteral() {
+	@Test
+	void testVeryLongUnquotedLiteral () {
     String literal = "a" + repeat('b', 3111337) + "c";
 
     String json = "["+literal+"]";
@@ -1104,14 +1204,16 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testDeeplyNestedArrays() {
+	@Test
+	void testDeeplyNestedArrays () {
     String json = "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]";
     String xml = json.replace("[", "<arr>").replace("]", "</arr>");
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testDeeplyNestedObjects() {
+	@Test
+	void testDeeplyNestedObjects () {
     // Build a JSON document structured like {"a":{"a":{"a":{"a":true}}}}, but 5000 levels deep
     String jarray = "{\"a\":%s}";
     String xarray = "<obj id=\"a\">%s</obj>";
@@ -1127,52 +1229,59 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringEndingInSlash() {
+	@Test
+	void testStringEndingInSlash () {
     String json = "/";//MalformedJsonException: Expected value at line 1 column 1 path $
     String xml = "<unk pos=\"0\" char=\"/\" hex=\"2f\" scope=\"NONEMPTY_DOCUMENT\" stack=\"1\" tokens=\"1\" />";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testDocumentWithCommentEndingInSlash() {
+	@Test
+	void testDocumentWithCommentEndingInSlash () {
     String json = "/* foo *//";//MalformedJsonException: Expected value at line 1 column 10 path $
     String xml="<!-- foo --><unk pos=\"9\" char=\"/\" hex=\"2f\" scope=\"NONEMPTY_DOCUMENT\" stack=\"1\" tokens=\"1\" />";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringWithLeadingSlash() {
+	@Test
+	void testStringWithLeadingSlash () {
     String json = "/x";
     String xml = "<unk pos=\"0\" char=\"/\" hex=\"2f\" scope=\"NONEMPTY_DOCUMENT\" stack=\"1\" tokens=\"1\" /><val>x</val>";
     //gson: JsonSyntaxException: MalformedJsonException: Expected value at line 1 column 1 path $
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testUnterminatedObject() {
+	@Test
+	void testUnterminatedObject () {
     String json = "{\"a\":\"android\"x";//MalformedJsonException: Unterminated object at line 1 column 16 path $.a
     String xml = "<obj><val id=\"a\">android</val><val id=\"x\" class=\"null\" /></obj>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testVeryLongQuotedString() {
+	@Test
+	void testVeryLongQuotedString () {
     char[] stringChars = new char[1024 * 125];
     Arrays.fill(stringChars, 'x');
     String string = new String(stringChars);
     String json = "[\"" + string + "\"]";
     String xml = json.replace("[\"", "<arr><val>").replace("\"]", "</val></arr>");
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testVeryLongUnquotedString() {
+	@Test
+	void testVeryLongUnquotedString () {
     char[] stringChars = new char[1024 * 127];
     Arrays.fill(stringChars, 'x');
     String string = new String(stringChars);
     String json = "[" + string + "]";
     String xml = "<arr><val>"+string+"</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testVeryLongUnterminatedString() {
+	@Test
+	void testVeryLongUnterminatedString () {
     char[] stringChars = new char[111333];//EOFException: End of input at line 1 column 111335 path $[1]
     Arrays.fill(stringChars, 'x');
     String string = new String(stringChars);
@@ -1181,70 +1290,80 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipVeryLongUnquotedString() {
+	@Test
+	void testSkipVeryLongUnquotedString () {
     String json = "["+repeat('x', 123456)+"]";
     String xml = json.replace("[", "<arr><val>").replace("]", "</val></arr>");
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipTopLevelUnquotedString() {
+	@Test
+	void testSkipTopLevelUnquotedString () {
     String json = repeat('x', 111111);
     String xml = "<val>"+json+"</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipVeryLongQuotedString() {
+	@Test
+	void testSkipVeryLongQuotedString () {
     String x = repeat('x', 98192);
     String json = "[\""+x+"\"]";
     String xml = "<arr><val>"+x+"</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testSkipTopLevelQuotedString() {
+	@Test
+	void testSkipTopLevelQuotedString () {
     String json = "\""+repeat('x', 12345)+"\" ";
     String xml = json.replace("\" ", "</val>").replace("\"", "<val>");
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringAsNumberWithTruncatedExponent() {
+	@Test
+	void testStringAsNumberWithTruncatedExponent () {
     String json = "[123e]";
     String xml = "<arr><val>123e</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringAsNumberWithDigitAndNonDigitExponent() {
+	@Test
+	void testStringAsNumberWithDigitAndNonDigitExponent () {
     String json = "[123e4b]";
     String xml = "<arr><val>123e4b</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStringAsNumberWithNonDigitExponent() {
+	@Test
+	void testStringAsNumberWithNonDigitExponent () {
     String json = "[123eb]";
     String xml = "<arr><val>123eb</val></arr>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testEmptyStringName() {
+	@Test
+	void testEmptyStringName () {
     String json = "{\"\":true}";
     String xml = "<obj><val id=\"\" class=\"bool\">true</val></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testStrictExtraCommasInMaps() {
+	@Test
+	void testStrictExtraCommasInMaps () {
     String json = "{\"a\":\"b\",}";//MalformedJsonException: Expected name at line 1 column 11 path $.a
     String xml = "<obj><val id=\"a\">b</val></obj>";
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testLenientExtraCommasInMaps() {
+	@Test
+	void testLenientExtraCommasInMaps () {
     String json = "{\"a\":\"b\",}";
     String xml = "<obj><val id=\"a\">b</val></obj>";
     //gson: JsonSyntaxException: MalformedJsonException: Expected name at line 1 column 11 path $.a
@@ -1257,7 +1376,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     return new String(array);
   }
 
-  public void testMalformedDocuments() {
+	@Test
+	void testMalformedDocuments () {
     assertEquals("", jsonToXml(""));
     assertEquals("<obj></obj>", jsonToXml("{]"));
     assertEquals("<obj></obj>", jsonToXml("{,"));
@@ -1266,8 +1386,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals("<obj><obj id=\"\"><obj id=\"\"><obj id=\"\"><obj id=\"\"></obj></obj></obj></obj></obj>", jsonToXml("{{{{{]]]]]"));
     assertEquals("<obj><arr id=\"\"></arr></obj>", jsonToXml("{["));
     assertEquals("<obj><arr id=\"\"><obj><arr id=\"\"><obj><arr id=\"\"></arr></obj></arr></obj></arr></obj>", jsonToXml("{[{[{["));
-    assertEquals("<arr><obj><arr id=\"\"><obj><arr id=\"\"><obj><arr id=\"\"></arr></obj></arr></obj></arr></obj></arr>",
-        jsonToXml("[{[{[{["));
+    assertEquals("<arr><obj><arr id=\"\"><obj><arr id=\"\"><obj><arr id=\"\"></arr></obj></arr></obj></arr></obj></arr>", jsonToXml("[{[{[{["));
     assertEquals("<obj><val id=\"\" class=\"null\" /></obj>", jsonToXml("{:"));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\""));
     assertEquals("<obj><val id=\"name\" class=\"null\" /></obj>", jsonToXml("{\"name\","));
@@ -1306,7 +1425,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals("<obj><val id=\"name\" class=\"bool\">false</val></obj>", jsonToXml("{\"name\":false,,"));
   }
 
-  public void testUnterminatedStringFailure() {
+	@Test
+	void testUnterminatedStringFailure () {
     String json = "[\"string";
     String xml = "<arr><val class=\"quot quoted str\">string</val></arr>";
     //gson: JsonSyntaxException: MalformedJsonException: Unterminated string at line 1 column 9 path $[0]
@@ -1336,7 +1456,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToDetailedXml(json));
   }
 
-  public void testDeepArray () {
+	@Test
+	void testDeepArray () {
     String json = repeat('[', 12345)+"42"+repeat(']', 12345);
     String xml = json.replace("[", "<arr>").replace("]", "</arr>").replace("42", "<val>42</val>");
     //gson: JsonParseException: Failed parsing JSON source: JsonReader at line 1 column 7792 path $[0] - StackOverflowError
@@ -1347,7 +1468,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testJustTextNotJson () {
+	@Test
+	void testJustTextNotJson () {
     String json = "This is not a JSON! But... Try it, ok? 42, 1; 2; 'tester' 17\n 95, foo = \"bar\"; true";
     String xml = "<val>This</val><val>is</val><val>not</val><val>a</val><val>JSON!</val>" +
         "<val>But...</val><val>Try</val><val>it</val><val>ok?</val>" +
@@ -1359,7 +1481,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testMetaData () {
+	@Test
+	void testMetaData () {
     String json = "{'a'=-42, b: \"1sorry \", \"c\" : ' +3.14159 \t\n' d=>'http://ya.ru'}";
 
     JsonTreeBuilder treeBuilder = new JsonTreeBuilder(){
@@ -1411,7 +1534,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testArrNull () {
+	@Test
+	void testArrNull () {
     assertEquals("<arr>" +
         "<val class=\"null\" />" +
         "<val class=\"null\" />" +
@@ -1438,8 +1562,8 @@ public final class JsonTreeBuilderTest extends TestCase {
         Document doc = Jsoup.parse(is, "UTF-8", "", parser);
         doc.outputSettings().prettyPrint(false);
         assertEquals(2, doc.childNodeSize());
-        assertTrue(doc.childNode(0) instanceof Comment);
-        assertEquals(13, doc.childNode(1).childNodeSize());
+				assertInstanceOf(Comment.class, doc.childNode(0));
+        assertEquals(13, doc.childNode(1).childNodeSize(), ()->doc.childNode(1).toString());
         return doc;
       }
     } catch(IOException e){
@@ -1474,7 +1598,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     }//else JsonNull
   }
 
-  public void testSpeed () {
+	@Test
+	void testSpeed () {
     Runnable rg = new Runnable() {
       @Override public void run () {
         try(Reader reader = new InputStreamReader(getClass().getResourceAsStream("/bigdata.json"), UTF_8)) {
@@ -1511,7 +1636,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     long tx = loopIt(rx, 1000);
 
     assertTrue(tg < tj);//GSON is the quickest one
-    assertTrue("tj="+tj+", tx="+tx, tj < tx+777);//json is usually the 2nd one, but xml is fast too now
+    assertTrue(tj < tx+777, "tj="+tj+", tx="+tx);//json is usually the 2nd one, but xml is fast too now
   }
 
 
@@ -1552,7 +1677,8 @@ public final class JsonTreeBuilderTest extends TestCase {
     }
   }
 
-  public void testBinarySame () throws Exception {
+	@Test
+	void testBinarySame () throws Exception {
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
     Document docXml  = loadDoc("/bigdata.xml",  Parser.xmlParser());
 
@@ -1581,7 +1707,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testBad () {
+	@Test
+	void testBad () {
     String json = "\uFFFE\n\n)]}'\n true ; [[{;;,,\n\n]]} , [[,]] {] [} [{true=>false; 42 32\n yes='no' \"no\":'yes';n;z:";
     String xml = "<val class=\"bool\">true</val>" +
         "<arr><arr><obj></obj></arr></arr>" +
@@ -1598,7 +1725,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testEof () {
+	@Test
+	void testEof () {
     String json = "[";//gson: EOFException: End of input at line 1 column 2 path $[0]
     String xml = "<arr></arr>";
     assertEquals(xml, jsonToXml(json));
@@ -1609,7 +1737,7 @@ public final class JsonTreeBuilderTest extends TestCase {
 
     json = "true";
     xml = "<val class=\"bool\">true</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[true";//gson: EOFException: End of input at line 1 column 6 path $[1]
@@ -1622,7 +1750,7 @@ public final class JsonTreeBuilderTest extends TestCase {
 
     json = "str";
     xml = "<val>str</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
     json = "'str";//MalformedJsonException: Unterminated string at line 1 column 5 path $
     assertEquals(xml, jsonToXml(json));
@@ -1639,7 +1767,7 @@ public final class JsonTreeBuilderTest extends TestCase {
 
     json = "42";
     xml = "<val>42</val>";
-    
+
     assertEquals(xml, jsonToXml(json));
 
     json = "[42";
@@ -1700,27 +1828,27 @@ public final class JsonTreeBuilderTest extends TestCase {
     assertEquals(xml, jsonToXml(json));
   }
 
-  public void testJavaDocExample () throws Exception {
+	@Test
+	void testJavaDocExample () throws Exception {
     Document doc = Jsoup.parse(getClass().getResourceAsStream("/example.json"), "UTF-8", "", jsonParser());
     System.out.println(repeat('#', 100)+doc.html()+repeat('#', 100));
     //doc.outputSettings().prettyPrint(false);
-    assertEquals(
-        "<!--\nI am here: src\\test\\resources/example.json *--><obj><arr id=\"projects\">" +
-        "<obj><val id=\"project_name\" class=\"apos quoted str\">Google Gson</val>" +
-        "<val id=\"url\" class=\"quot quoted str\">https://github.com/google/gson</val>" +
-        "<val id=\"rating\" class=\"unquoted num\">4.956</val>"+
-        "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"unquoted str\">Jesse</val>" +
-        "<val id=\" last  name \" class=\"quot quoted str\">'Wilson ' </val>" +
-        "<val id=\"home_page\" class=\"quot quoted str\">https://medium.com/@swankjesse</val></obj></arr></obj>" +
-        "<obj><val id=\"project_name\" class=\"unquoted str\">jsoup</val>" +
-        "<val id=\"url\" class=\"quot quoted str\">https://jsoup.org</val>" +
-        "<val id=\"rating\" class=\"unquoted num\">5e10</val>"+
-        "<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"quot quoted str\">Jonathan</val>" +
-        "<val id=\"last_name\" class=\"quot quoted str\">Hedley</val>" +
-        "<val id=\"home_page\" class=\"quot quoted str\">https://jhy.io</val></obj>" +
-        "<obj><!--/2nd OBJ in Array-->"+
-        "<val id=\"first_name\" class=\"quot quoted str\">Andrej</val><val id=\"last_name\" class=\"quot quoted str\">Fink</val>" +
-        "<val id=\" home\n     page \" class=\"quot quoted str\"> https://github.com/\n  magicprinc </val></obj></arr></obj></arr></obj>",doc.html());
+    assertEquals("<!--\nI am here: src\\test\\resources/example.json *--><obj><arr id=\"projects\">" +
+		"<obj><val id=\"project_name\" class=\"apos quoted str\">Google Gson</val>" +
+		"<val id=\"url\" class=\"quot quoted str\">https://github.com/google/gson</val>" +
+		"<val id=\"rating\" class=\"unquoted num\">4.956</val>"+
+		"<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"unquoted str\">Jesse</val>" +
+		"<val id=\" last  name \" class=\"quot quoted str\">'Wilson ' </val>" +
+		"<val id=\"home_page\" class=\"quot quoted str\">https://medium.com/@swankjesse</val></obj></arr></obj>" +
+		"<obj><val id=\"project_name\" class=\"unquoted str\">jsoup</val>" +
+		"<val id=\"url\" class=\"quot quoted str\">https://jsoup.org</val>" +
+		"<val id=\"rating\" class=\"unquoted num\">5e10</val>"+
+		"<arr id=\"contributors\"><obj><val id=\"first_name\" class=\"quot quoted str\">Jonathan</val>" +
+		"<val id=\"last_name\" class=\"quot quoted str\">Hedley</val>" +
+		"<val id=\"home_page\" class=\"quot quoted str\">https://jhy.io</val></obj>" +
+		"<obj><!--/2nd OBJ in Array-->"+
+		"<val id=\"first_name\" class=\"quot quoted str\">Andrej</val><val id=\"last_name\" class=\"quot quoted str\">Fink</val>" +
+		"<val id=\" home\n     page \" class=\"quot quoted str\"> https://github.com/\n  magicprinc </val></obj></arr></obj></arr></obj>", doc.html());
     assertEquals("Fink", doc.select("#contributors obj:eq(1) #last_name").text());
     assertEquals("jsoup", doc.select("#projects #project_name.str.unquoted").text());
     assertEquals("Fink", doc.select("#contributors obj:eq(1) #last_name").text());
@@ -1736,7 +1864,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testIsNumeric () {
+	@Test
+	void testIsNumeric () {
     JsonTreeBuilder j = new JsonTreeBuilder();
     assertFalse(j.isNumeric(""));
     assertFalse(j.isNumeric(" \t\n"));
@@ -1778,10 +1907,11 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testYandexTranslate () {
+	@Test
+	void testYandexTranslate () {
     String json = "{\"code\":200,\"lang\":\"de-en\",\"text\":[\"My Name is Andrey.\"]}";
     String xml = "<obj><val id=\"code\">200</val><val id=\"lang\">de-en</val><arr id=\"text\"><val>My Name is Andrey.</val></arr></obj>";
-    
+
     assertEquals(xml, jsonToXml(json));
     xml = "<obj><val id=\"code\" class=\"unquoted num\">200</val>" +
         "<val id=\"lang\" class=\"quot quoted str\">de-en</val>" +
@@ -1790,7 +1920,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void testParseFragment () {
+	@Test
+	void testParseFragment () {
     Element root = new Element("fake");
     JsonTreeBuilder jtb = new JsonTreeBuilder(){
       @Override protected void initialiseParse(Reader input, String baseUri, Parser parser) {
@@ -1799,6 +1930,7 @@ public final class JsonTreeBuilderTest extends TestCase {
       }
     };
     List<Node> nodes = jtb.parseFragment("[a,b,] 42", root, "foo.bar", new Parser(jtb));
+    //List<Node> nodes = jtb.parseFragment(new StringReader("[a,b,] 42"), root, "foo.bar", new Parser(jtb));
     assertEquals(2, nodes.size());
     assertEquals("ab", ((Element)nodes.get(0)).text());
     assertEquals("42", ((Element)nodes.get(1)).text());
@@ -1810,7 +1942,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
 
-  public void test100 () {
+	@Test
+	void test100 () {
     String json = " \r\t\n\f5";
 
     JsonTreeBuilder treeBuilder = new JsonTreeBuilder();
@@ -1821,8 +1954,7 @@ public final class JsonTreeBuilderTest extends TestCase {
     treeBuilder = new JsonTreeBuilder();
     treeBuilder.initialiseParse(new StringReader(json), "", new Parser(treeBuilder));
     assertEquals(NEXT_TOKEN.UNQUOTED, treeBuilder.nextToken());
-    assertEquals("JsonTreeBuilder@ 5 ='5' U+35 scope=NONEMPTY_DOCUMENT, name='null', tokens: 1, stack: 1 >>5",
-            treeBuilder.toString());
+    assertEquals("JsonTreeBuilder@ 5 ='5' U+35 scope=NONEMPTY_DOCUMENT, name='null', tokens: 1, stack: 1 >>5", treeBuilder.toString());
 
     assertEquals("<val>\u00ff</val>", jsonToXml("'\\uff"));
 
@@ -1833,7 +1965,8 @@ public final class JsonTreeBuilderTest extends TestCase {
                     repeat('x', 78)+"...", treeBuilder.toString());
   }
 
-  public void testJavaDocExample2 () throws IOException {
+	@Test
+	void testJavaDocExample2 () throws IOException {
     Document doc = Jsoup.connect("https://github.com/magicprinc/jsoup.json/raw/master/src/test/resources/example.json").parser(jsonParser()).get();
     assertEquals("projects", doc.child(0).child(0).id());
     //1.12.1 api:
@@ -1848,7 +1981,8 @@ public final class JsonTreeBuilderTest extends TestCase {
   }
 
     /* https://github.com/magicprinc/JSONTestSuite */
-    public void testFullJSONTestSuiteOnline() throws Exception {
+		@Test
+		void testFullJSONTestSuiteOnline () throws Exception {
          String[] testSrcs = {"https://github.com/magicprinc/JSONTestSuite/tree/master/test_parsing",
                 "https://github.com/magicprinc/JSONTestSuite/tree/master/test_transform"};
 

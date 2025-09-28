@@ -35,7 +35,7 @@ dependencies {
 
   //works since 1.12, but XML escaping is better and XML is more compact since 1.14.2
   //api vs implementation: jsoup is 100% already declared, if we are used
-  implementation('org.jsoup:jsoup:1.+')
+  implementation('org.jsoup:jsoup:1.17.+')
 	implementation("org.jspecify:jspecify:1.+")
 
 	// TEST
