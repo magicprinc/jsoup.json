@@ -25,6 +25,7 @@ import org.jsoup.nodes.LeafNode;
 import org.jsoup.nodes.Node;
 import org.jspecify.annotations.Nullable;
 
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -664,8 +665,13 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
     }
   }
 
-	/// @see #insertLeafNode(LeafNode)
 	@Override
+	protected void initialiseParse (Reader input, String baseUri, Parser parser) {
+		super.initialiseParse(input, baseUri, parser);
+		stack.add(doc);
+	}
+
+	/// @see #insertLeafNode(LeafNode)
 	protected void insertNode (Node node) {
 		currentElement().appendChild(node);
 		//todo onNodeInserted(node);

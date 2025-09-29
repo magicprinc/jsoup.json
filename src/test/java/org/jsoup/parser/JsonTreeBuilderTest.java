@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import static java.nio.charset.StandardCharsets.*;
 import static org.jsoup.parser.JsonTreeBuilder.jsonParser;
@@ -1563,7 +1564,12 @@ final class JsonTreeBuilderTest {
         doc.outputSettings().prettyPrint(false);
         assertEquals(2, doc.childNodeSize());
 				assertInstanceOf(Comment.class, doc.childNode(0));
-        assertEquals(13, doc.childNode(1).childNodeSize(), ()->doc.childNode(1).toString());
+
+				List<Node> childed = doc.childNode(1).childNodesCopy();
+				String childrenNames = childed.stream().map(Node::nodeName).collect(Collectors.joining(", "));
+				assertEquals("val, arr, val, val, arr, val, val, val, val, arr, val, arr, arr", childrenNames);
+
+				assertEquals(13, doc.childNode(1).childNodeSize(), ()->doc.childNode(1).toString());
         return doc;
       }
     } catch(IOException e){
@@ -1673,23 +1679,25 @@ final class JsonTreeBuilderTest {
     String enable = System.getProperty("genXml");
     if (enable != null && enable.length()>0) {
       Path pathFile = Paths.get(fileName);//e.g. "/temp/bigdata.xml"
-      Files.write(pathFile, xml.getBytes(UTF_8));
+      Files.writeString(pathFile, xml);
     }
   }
 
 	@Test
 	void testBinarySame () throws Exception {
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
-    Document docXml  = loadDoc("/bigdata.xml",  Parser.xmlParser());
+		docJson.outputSettings().prettyPrint(false);
+		String jsonXml = docJson.html();
+		writeXml(jsonXml, "/temp/bigdata.xml");
 
-    docJson.outputSettings().prettyPrint(false);
-    String jsonXml = docJson.html();
-    docXml.outputSettings().prettyPrint(false);
+    Document docXml  = loadDoc("/bigdata.xml",  Parser.xmlParser());
+		docXml.outputSettings().prettyPrint(false);
     String xmlXml = docXml.html();
     assertEquals(jsonXml, xmlXml);
+		writeXml(jsonXml, "/temp/bigdata2.xml");
+
     assertEquals(docJson.text(), docXml.text());
 
-    writeXml(jsonXml, "/temp/bigdata.xml");
 
     assertTrue(binarySame("/bigdata.xml", jsonXml));
     assertTrue(binarySame("/bigdata.xml", xmlXml));
