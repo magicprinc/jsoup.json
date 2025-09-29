@@ -1686,6 +1686,9 @@ final class JsonTreeBuilderTest {
 	@Test
 	void testBinarySame () throws Exception {
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
+		docJson.outputSettings().prettyPrint(true);
+		writeXml(docJson.html(), "/temp/bigdata_pretty.xml");
+		writeXml(docJson.outerHtml(), "/temp/bigdata_pretty_outer.xml");
 		docJson.outputSettings().prettyPrint(false);
 		String jsonXml = docJson.html();
 		writeXml(jsonXml, "/temp/bigdata.xml");
