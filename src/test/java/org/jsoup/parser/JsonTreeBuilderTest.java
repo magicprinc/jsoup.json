@@ -1685,6 +1685,8 @@ final class JsonTreeBuilderTest {
 
 	@Test
 	void testBinarySame () throws Exception {
+		JsonTreeBuilder.log = Path.of("p"+System.currentTimeMillis()+".log");
+
     Document docJson = loadDoc("/bigdata.json", jsonParser(false));
 		docJson.outputSettings().prettyPrint(true);
 		writeXml(docJson.html(), "/temp/bigdata_pretty.xml");
@@ -1715,6 +1717,8 @@ final class JsonTreeBuilderTest {
     assertEquals("val", els.get(els.size()-1).nextElementSibling().tagName());
     assertEquals("css", els.get(els.size()-1).nextElementSibling().id());
     assertEquals(229, docXml.select("#guid").size());
+
+		JsonTreeBuilder.log = null;
   }
 
 

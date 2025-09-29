@@ -25,7 +25,11 @@ import org.jsoup.nodes.LeafNode;
 import org.jsoup.nodes.Node;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -671,10 +675,20 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
 		stack.add(doc);
 	}
 
+	static Path log;
+
 	/// @see #insertLeafNode(LeafNode)
 	protected void insertNode (Node node) {
 		currentElement().appendChild(node);
 		//todo onNodeInserted(node);
+		try {
+			if (log != null)
+				Files.writeString(log,
+					(node.nodeName() +" | "+	node +" | "+ this).replace("\r\n"," ").replace('\n', ' ').replace('\r',' ')+ "\n\n",
+					StandardOpenOption.APPEND, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		} catch (IOException e){
+			e.printStackTrace();
+		}
 	}
 
 	/// @see XmlTreeBuilder#insertElementFor(Token.StartTag)
@@ -689,7 +703,15 @@ public class JsonTreeBuilder extends XmlTreeBuilder {
 			tag.name(tagName);// × settings
     }
     insertElementFor(tag);
-  }
+		try {
+			if (log != null)
+				Files.writeString(log,
+					("*** "+tag.tagName +" | "+	tag +" | "+ this).replace("\r\n"," ").replace('\n', ' ').replace('\r',' ')+ "\n\n",
+					StandardOpenOption.APPEND, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+	}
 
   void insertBoolean(boolean value) {
     Tag tag = Tag.valueOf(STR_VAL, settings);
