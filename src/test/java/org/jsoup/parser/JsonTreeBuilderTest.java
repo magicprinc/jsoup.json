@@ -1686,39 +1686,40 @@ final class JsonTreeBuilderTest {
 	@Test
 	void testBinarySame () throws Exception {
 		JsonTreeBuilder.log = Path.of("p"+System.currentTimeMillis()+".log");
+		try {
+			Document docJson = loadDoc("/bigdata.json", jsonParser(false));
+			docJson.outputSettings().prettyPrint(true);
+			writeXml(docJson.html(), "/temp/bigdata_pretty.xml");
+			writeXml(docJson.outerHtml(), "/temp/bigdata_pretty_outer.xml");
+			docJson.outputSettings().prettyPrint(false);
+			String jsonXml = docJson.html();
+			writeXml(jsonXml, "/temp/bigdata.xml");
 
-    Document docJson = loadDoc("/bigdata.json", jsonParser(false));
-		docJson.outputSettings().prettyPrint(true);
-		writeXml(docJson.html(), "/temp/bigdata_pretty.xml");
-		writeXml(docJson.outerHtml(), "/temp/bigdata_pretty_outer.xml");
-		docJson.outputSettings().prettyPrint(false);
-		String jsonXml = docJson.html();
-		writeXml(jsonXml, "/temp/bigdata.xml");
+			Document docXml = loadDoc("/bigdata.xml", Parser.xmlParser());
+			docXml.outputSettings().prettyPrint(false);
+			String xmlXml = docXml.html();
+			assertEquals(jsonXml, xmlXml);
+			writeXml(jsonXml, "/temp/bigdata2.xml");
 
-    Document docXml  = loadDoc("/bigdata.xml",  Parser.xmlParser());
-		docXml.outputSettings().prettyPrint(false);
-    String xmlXml = docXml.html();
-    assertEquals(jsonXml, xmlXml);
-		writeXml(jsonXml, "/temp/bigdata2.xml");
-
-    assertEquals(docJson.text(), docXml.text());
+			assertEquals(docJson.text(), docXml.text());
 
 
-    assertTrue(binarySame("/bigdata.xml", jsonXml));
-    assertTrue(binarySame("/bigdata.xml", xmlXml));
-    assertFalse(binarySame("/bigdata.xml", jsonXml+' '));
-    assertFalse(binarySame("/bigdata.xml", jsonXml.substring(1)));
-    assertFalse(binarySame("/bigdata.xml", ' '+jsonXml.substring(1)));
+			assertTrue(binarySame("/bigdata.xml", jsonXml));
+			assertTrue(binarySame("/bigdata.xml", xmlXml));
+			assertFalse(binarySame("/bigdata.xml", jsonXml + ' '));
+			assertFalse(binarySame("/bigdata.xml", jsonXml.substring(1)));
+			assertFalse(binarySame("/bigdata.xml", ' ' + jsonXml.substring(1)));
 
-    Elements els = docJson.select(":containsOwn(a6a2f2e0-6d5b-11e6-adf3-8c705a50cbf0)");
-    assertEquals(132, els.size());
-    assertEquals("val", els.get(els.size()-1).tagName());
-    assertEquals("crowdanki_uuid", els.get(els.size()-1).id());
-    assertEquals("val", els.get(els.size()-1).nextElementSibling().tagName());
-    assertEquals("css", els.get(els.size()-1).nextElementSibling().id());
-    assertEquals(229, docXml.select("#guid").size());
-
-		JsonTreeBuilder.log = null;
+			Elements els = docJson.select(":containsOwn(a6a2f2e0-6d5b-11e6-adf3-8c705a50cbf0)");
+			assertEquals(132, els.size());
+			assertEquals("val", els.get(els.size() - 1).tagName());
+			assertEquals("crowdanki_uuid", els.get(els.size() - 1).id());
+			assertEquals("val", els.get(els.size() - 1).nextElementSibling().tagName());
+			assertEquals("css", els.get(els.size() - 1).nextElementSibling().id());
+			assertEquals(229, docXml.select("#guid").size());
+		} finally {
+			JsonTreeBuilder.log = null;
+		}
   }
 
 
